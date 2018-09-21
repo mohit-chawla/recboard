@@ -1,0 +1,2 @@
+class ServerUnreachable(Exception):
+    pass
