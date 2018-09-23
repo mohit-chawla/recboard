@@ -11,6 +11,9 @@ from rearpb import  rearpb_pb2_grpc,rearpb_pb2
 from .common import exceptions
 from django.views.generic.base import TemplateView
 
+ 
+from .forms import UploadFileForm
+from .models import UploadFile
 
 # Create your views here.
 def get_client():
@@ -33,7 +36,17 @@ def index(request):
 		return HttpResponse(response.message)
 	return HttpResponse("GRPC Server is unreachable")
 
-# def create(request):
+def upload(request):
+	if request.method == 'POST':
+		form = UploadFileForm(request.POST, request.FILES)
+		if form.is_valid():
+			for filename, file in request.FILES.items():
+				#TODO: send files to grpc server API here
+				print(filename,file.read())
+	else:
+		raise Exception("Invalid request")
+	return HttpResponse("Uploaded")
+
 
 class HomePage(TemplateView):
 	"""
