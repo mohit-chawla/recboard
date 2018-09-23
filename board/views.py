@@ -9,6 +9,8 @@ import grpc
 from rearpb import  rearpb_pb2_grpc,rearpb_pb2
 
 from .common import exceptions
+from django.views.generic.base import TemplateView
+
 
 # Create your views here.
 def get_client():
@@ -32,4 +34,9 @@ def index(request):
 	return HttpResponse("GRPC Server is unreachable")
 
 # def create(request):
-	
+
+class HomePage(TemplateView):
+	"""
+		This is a class based view for home page (/home)
+	"""
+	template_name = 'home.html'
