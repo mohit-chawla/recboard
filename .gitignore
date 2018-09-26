@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.DS_Store
 
 # C extensions
 *.so
@@ -102,3 +103,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# index checkpoints | to be removed after POC is complete
+checkpoint
+*.ckpt.*
+
+# dataset
+board/ctrsr_datasets/
