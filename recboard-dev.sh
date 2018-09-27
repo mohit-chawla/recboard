@@ -6,7 +6,6 @@ end="#recboard-ends-here" #line with pattern to delete at last
 warning="#WARNING do not add your variables in this area"
 
 RBROOT="$HOME/recboard"
-REARSERVER="$RBROOT/rear/rear_server.py"
 BASH_PROFILE="$HOME/.bash_profile" 
 
 echo "This script require you to clone/move recboard directory in $HOME"
@@ -27,6 +26,12 @@ else
     echo "$RBROOT not present"
 fi
 
+if [ ! -f "$BASH_PROFILE" ]
+then
+	echo "No bash_profile found, $BASH_PROFILE"
+	echo "creating $BASH_PROFILE"
+	touch $BASH_PROFILE
+fi
 
 if [ -f "$BASH_PROFILE" ]
 then
@@ -41,10 +46,6 @@ then
  		python "$RBROOT"/manage.py runserver
 	}
 
-	rear(){
-		python "$REARSERVER"
-	}
-
 	">>$BASH_PROFILE
 	echo $start>>$BASH_PROFILE
 	source $BASH_PROFILE
@@ -55,7 +56,6 @@ then
 		everything configured 
 		feel free to use:
 		cd $dollar$var_name : go to recboard directory
-		rear : start backend server
 		board: start django server
 	"
 else
