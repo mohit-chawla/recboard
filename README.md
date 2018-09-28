@@ -4,8 +4,8 @@ Recboard aims to provide recommedation models as a service. We use [openrec](htt
 
 **Objectives:**
 Recboard plans to satisfy the following objectives:
-- Create recommendation systems on the fly using a user iterface.
-- Visualize training (running locally or remote) and results.
+- Create recommendation systems on the fly via a UI or a command line tool.
+- Visualize model training (running locally or in a remote machine) and results.
 - Serve the trained model as a REST API.
 
 
