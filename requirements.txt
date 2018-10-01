@@ -1,9 +1,4 @@
 Django==2.1.1
-googleapis-common-protos==1.5.3
-grpcio==1.15.0
-grpcio-tools==1.15.0
 openrec==0.2.1
-protobuf==3.6.1
 pytz==2018.5
--e git+git@github.com:mohit-chawla/recboard.git@7adebf6543b26c2f3e1770de2b600f23d85ab82e#egg=rearpb&subdirectory=pb/rearpb
 six==1.11.0
