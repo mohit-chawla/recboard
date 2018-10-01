@@ -1,6 +1,9 @@
 import numpy as np
 import random
 import os
+import logging
+
+FORMAT = '%(asctime)-15s %(message)s'
 
 class ModelManager:
     def __init__(self, recommender_name, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
@@ -10,21 +13,25 @@ class ModelManager:
         self.test_sampler = test_sampler
         self.evaluation_metric = evaluation_metric
         self.path_to_dataset = path_to_dataset
+        
+        logging.basicConfig(format=FORMAT)
+        self.logger = logging.getLogger(__name__)
 
         self.model_id = '100xxks'
-        print("ModelManager init generated model id=", self.model_id)
+        self.logger.info("ModelManager init generated model id=", self.model_id)
 
         
     def sample_data_and_train(self):
-        print("sample_data_and_train called, pid =", os.getpid())
-        print("-------- sample_data_and_train starts --------")
+        self.logger.warning('sample_data_and_train called, pid = %d Please kill process on unsuccessful training', os.getpid())
+        self.logger.info('-------- sample_data_and_train starts --------')
+        
         total_users = 0
         interactions_count = 0
         with open(os.path.dirname(os.path.abspath(__file__))+self.path_to_dataset, 'r') as fin:
             for line in fin:
                 interactions_count += int(line.split()[0])
                 total_users += 1
-        print("############ collecting data.. ############")
+        self.logger.info('############ collecting data.. ############')
 
         # radomly hold out an item per user for validation and testing respectively.
         val_structured_arr = np.zeros(total_users, dtype=[('user_id', np.int32), 
@@ -61,7 +68,7 @@ class ModelManager:
                 next_user_id += 1
 
 
-        print("############ instantiating dataset.. ############")
+        self.logger.info('############ instantiating dataset.. ############')
 
         from openrec.utils import Dataset
 
@@ -80,7 +87,7 @@ class ModelManager:
                             num_negatives=500,
                             name='Test')
 
-        print("############ instantiating Samplers.. ############")
+        self.logger.info("############ instantiating Samplers.. ############")
 
         from openrec.utils.samplers import RandomPairwiseSampler
         from openrec.utils.samplers import EvaluationSampler
@@ -93,7 +100,7 @@ class ModelManager:
         test_sampler = EvaluationSampler(batch_size=1000, 
                                         dataset=test_dataset)
 
-        print("############ instantiating Recommender.. ############")
+        self.logger.info("############ instantiating Recommender.. ############")
 
         from openrec.recommenders import BPR
 
@@ -106,13 +113,13 @@ class ModelManager:
                         train=True, serve=True)
 
 
-        print("############ instantiating Evaluator.. ############")
+        self.logger.info("############ instantiating Evaluator.. ############")
 
         from openrec.utils.evaluators import AUC
 
         auc_evaluator = AUC()
 
-        print("############ instantiating Model trainer.. ############")
+        self.logger.info("############ instantiating Model trainer.. ############")
 
         from openrec import ModelTrainer
 
@@ -126,5 +133,5 @@ class ModelManager:
                             train_sampler=train_sampler, 
                             eval_samplers=[val_sampler, test_sampler], 
                             evaluators=[auc_evaluator])
-        # print("THIS IS WHEN MODEL WILL START TRAINING... returning")
-        print("-------- sample_data_and_train ends --------")
+        # self.logger.info("THIS IS WHEN MODEL WILL START TRAINING... returning")
+        self.logger.info("-------- sample_data_and_train ends --------")
