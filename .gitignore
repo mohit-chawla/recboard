@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.DS_Store
 
 # C extensions
 *.so
@@ -102,3 +103,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# index checkpoints
+checkpoint
+*.ckpt.*
+
+# dataset
+board/ctrsr_datasets/
