@@ -2,8 +2,7 @@ from django.test import TestCase
 from board.common.idgen import IdGenerator
 
 class IdGeneratorTestCase(TestCase):
-
-	# def test_deterministic(self):
+	
 	def setUp(self):
 		self.generator = IdGenerator()
 
