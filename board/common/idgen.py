@@ -12,3 +12,4 @@ class IdGenerator():
 if __name__ == "__main__":
 	idgen = IdGenerator()
 	print(idgen.generate())
+	

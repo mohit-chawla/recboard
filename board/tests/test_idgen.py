@@ -22,6 +22,4 @@ class IdGeneratorTestCase(TestCase):
 		id1 = self.generator.generate()
 		id2 = self.generator.generate()
 		self.AssertEqual(len(id1), len(id2))
-
-
-
+		
