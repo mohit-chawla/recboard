@@ -112,3 +112,6 @@ checkpoint
 
 # dataset
 board/ctrsr_datasets/
+
+#upload dir
+board/data
