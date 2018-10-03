@@ -41,13 +41,26 @@ then
 	echo $warning>>$BASH_PROFILE
 	echo "export RBROOT="$RBROOT>>$BASH_PROFILE
 	echo " 
-
 	board(){
  		python "$RBROOT"/manage.py runserver
 	}
-
 	">>$BASH_PROFILE
-	echo $start>>$BASH_PROFILE
+
+	read -p "Do you want to automatically activate venv when you cd to a directory with venv ? [y/n] " -n 1 -r
+	echo    # (optional) move to a new line
+	if [[ $REPLY =~ ^[Yy]$ ]]
+	then
+    echo ' 
+	function cd {
+    	builtin cd "$@"
+    	if [ -d "venv" ] ; then
+        	source venv/bin/activate
+    	fi
+	}
+	'>>$BASH_PROFILE
+	fi
+
+	echo $end>>$BASH_PROFILE
 	source $BASH_PROFILE
 	dollar='$' 
 	var_name=(${!RBROOT@})
