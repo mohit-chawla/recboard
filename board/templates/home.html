@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock title %}
+
+{% block content %}  
+
+    {# Hero Section #}  
+    <b>This is Home page</b>
+    {# Main Section #}
+    <head>
+        <script language="JavaScript"  src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+        <meta charset="utf-8">
+        {% load static %}
+        <link href="{% static 'css/dropzone.css' %}" type="text/css" rel="stylesheet"/>
+    </head>
+    <body>
+ 
+        <!-- IMPORTANT enctype attribute! -->
+        <form class="dropzone" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
+            {% csrf_token %}
+        </form>
+        <button id="upload-file">
+            Upload
+        </button>
+        <div class="progress">
+            <div class="progress-bar progress-bar-primary" role="progressbar" data-dz-uploadprogress>
+                <span class="progress-text"></span>
+            </div>
+        </div>
+ 
+        <script src="{% static 'js/dropzone.js' %}"></script>
+        <script type="text/javascript">
+            Dropzone.options.myDropzone = {
+                acceptedFiles: ".xls,.csv,.xlsx",
+                maxFiles:1,
+                addRemoveLinks: true,
+                // Prevents Dropzone from uploading dropped files immediately
+                autoProcessQueue : false,
+                
+                accept: function(file, done) {
+                    console.log("uploaded");
+                    done();
+                },
+                
+                init: function() {
+
+                    myDropzone = this;
+                    var submitButton = document.querySelector("#upload-file")
+                    
+                    submitButton.addEventListener("click", function() {
+                        myDropzone.processQueue();
+                        // Tell Dropzone to process all queued files.
+                    });
+
+                    this.on("maxfilesexceeded", function(file){
+                        alert("You can upload only one dataset at a time.");
+                        this.removeFile(file)
+                    });
+
+                    this.on("complete", function (file) {
+                      if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                        // Actions that needed to be done after all uplaods complete
+                        this.removeFile(file)
+                        $(".progress-text").text("All uploads completed")
+                      }
+                    });
+
+                
+                },
+
+                //shows upload progress bar
+                uploadprogress: function(file, progress, bytesSent) {
+                    if (file.previewElement) {
+                        progressElement = file.previewElement.querySelector("[data-dz-uploadprogress]");
+                        progressElement.style.width = progress + "%";
+                        $(".progress-text").text(progress + "%")
+                    }
+                }
+
+            };
+        </script>
+    </body>
+</html>
+
+{% endblock content %}
+
