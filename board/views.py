@@ -12,7 +12,7 @@ from django.views.generic.base import TemplateView
 import logging
 
 from .forms import UploadFileForm
-from .models import UploadFile
+# from .models import UploadFile
 
 logging.getLogger(__name__)
 
@@ -21,7 +21,11 @@ def index(request):
     return HttpResponse("All good, server is up")
 
 def save_uploaded_file(filename,file):
-    with open('data/'+filename, 'wb+') as destination:
+    directory = "board/data/"
+    if not os.path.exists(directory):
+        print("making dir ...")
+        os.makedirs(directory)
+    with open(directory+filename, 'wb+') as destination:
         #use chunks instead of read to avoid having large files in memory
         for chunk in file.chunks():
             destination.write(chunk)
