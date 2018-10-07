@@ -10,4 +10,5 @@ Recboard plans to satisfy the following objectives:
 - Serve the trained model as a REST API.
 
 
-
+**Wiki**
+All fun stuff [here](https://github.com/mohit-chawla/<recboard>/wiki)
