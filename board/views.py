@@ -52,7 +52,7 @@ class HomePage(TemplateView):
 
 def create(request):
     print ('Parent process pid:', os.getpid())
-    PATH_TO_DATASET = '/ctrsr_datasets/citeulike-a/users.dat'
+    PATH_TO_DATASET = '/files/data/users.dat'
     model_controller_obj = ModelManager('BPR', 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
 
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
