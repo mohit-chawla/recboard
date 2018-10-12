@@ -14,6 +14,8 @@ import logging
 from .forms import UploadFileForm
 # from .models import UploadFile
 
+from django.http import JsonResponse
+
 logging.getLogger(__name__)
 
 
@@ -62,8 +64,10 @@ def create(request):
     try:
         generated_model_id = model_controller_obj.model_id
         err = "No err "
-        return HttpResponse(str(generated_model_id + err))
+        # return HttpResponse(str(generated_model_id + err))
+        return JsonResponse({'generated_model_id': generated_model_id, 'err':err})
     except:
         print("Error in getting generated model-id")
         p.terminate() # Force terminate training
-        return HttpResponse("Error in getting generated model-id")
+        # return HttpResponse("Error in getting generated model-id")
+        return JsonResponse({'generated_model_id': '', 'err':'Error in getting generated model-id'})

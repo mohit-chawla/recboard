@@ -26,6 +26,14 @@
                 <span class="progress-text"></span>
             </div>
         </div>
+
+        <div>
+            <hr>
+            To start training, use the button : 
+            <button id="start-training">
+                Start training
+            </button>
+        </div>
  
         <script src="{% static 'js/dropzone.js' %}"></script>
         <script type="text/javascript">
@@ -77,6 +85,20 @@
                 }
 
             };
+
+            document.getElementById("start-training").onclick = function () { 
+                    console.log('hello!'); 
+                    $.ajax({
+                    url: 'http://127.0.0.1:8000/board/create',
+                    data: {},
+                    dataType: 'json',
+                    success: function (data) {
+                        console.log('In success')
+                        console.log(data)
+                        alert('Done', data)
+                    }
+                });
+                };
         </script>
     </body>
 </html>
