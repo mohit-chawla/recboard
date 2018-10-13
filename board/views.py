@@ -13,8 +13,14 @@ import logging
 
 from .forms import UploadFileForm
 # from .models import UploadFile
+from .db import RecboardDB
+from .models import *
+import json
 
 logging.getLogger(__name__)
+
+db = RecboardDB()
+conn = db.connection    
 
 
 def index(request):
@@ -29,6 +35,7 @@ def save_uploaded_file(filename,file):
         #use chunks instead of read to avoid having large files in memory
         for chunk in file.chunks():
             destination.write(chunk)
+            db.insert('dataset',Dataset(name=filename,tags=["tags"]))
         logging.info("Uploaded file saved","file:",filename,"location:",destination)
 
 def upload(request):
@@ -41,6 +48,46 @@ def upload(request):
     else:
         raise Exception("Invalid request")
     return HttpResponse("Uploaded")
+
+def list_datasets(request):
+    """Returns list of datasets"""
+    return HttpResponse([ds.name for ds in db.select('dataset')])
+
+def list_workspaces(request):
+    """Returns list of datasets"""
+    users = db.select('user')
+    if not users:
+        return None
+    user = db.select('user')[0]
+    return HttpResponse([workspace.name for workspace in user.workspaces])
+
+
+def create_dummy_user():
+    db.insert('user',User(name="Mohit",phones=['1','2']))
+
+def get_request_body(request):
+    if not request or not request.body:
+        return None
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    return body
+
+def create_workspace(request):
+    """Creates a new workspace for userid"""
+    body = get_request_body(request)
+    if not body:
+        return HttpResponse("invalid request")
+    if not "workspace_name" in body:
+        return HttpResponse("Invalid request")
+    
+    if len(db.select('user')) == 0:
+        create_dummy_user()
+
+    user = db.select('user')[0]
+    user.workspaces.append(Workspace(name="workspacename2"))
+    db.insert('user',user)
+    return HttpResponse()
 
 
 class HomePage(TemplateView):
@@ -67,3 +114,7 @@ def create(request):
         print("Error in getting generated model-id")
         p.terminate() # Force terminate training
         return HttpResponse("Error in getting generated model-id")
+
+
+if __name__ == "__main__":
+    list_datasets()

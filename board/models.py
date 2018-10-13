@@ -8,16 +8,25 @@ from mongoengine import *
 
 
 # class Dataset(EmbeddedDocument):
-# 	name = StringField(max_length=120, required=True)
-# 	tags = ListField(StringField(max_length=120, required=True))
-# 	#TODO: switch from auto indexing to manual later
+class Dataset(Document):
+	name = StringField(max_length=120, required=True)
+	tags = ListField(StringField(max_length=120, required=True))
+	#TODO: switch from auto indexing to manual later
+	meta = {'collection': 'dataset'}
 
+class Workspace(EmbeddedDocument):
+	name = StringField(max_length=120, required=True)
+	
+	
 class User(Document):
 	name = StringField(max_length=120, required=True)
 	# datasets = ListField(EmbeddedDocumentField(Dataset)) #reference
 	#TODO: switch from auto indexing to manual later
+	phones = ListField(StringField(max_length=120, required=True))
+	workspaces = ListField(EmbeddedDocumentField(Workspace))
 	meta = {'collection': 'user'}
-	
+
+
 # class Model(Document):
 # 	name = StringField(max_length=120, required=True)
 # 	#TODO: switch from auto indexing to manual later
