@@ -10,6 +10,8 @@ from .model_manager import ModelManager
 from .common import exceptions
 from django.views.generic.base import TemplateView
 import logging
+import json
+
 
 from .forms import UploadFileForm
 # from .models import UploadFile
@@ -20,7 +22,7 @@ logging.getLogger(__name__)
 
 
 def index(request):
-    return HttpResponse("All good, server is up")
+    return JsonResponse({'message':"All good, server is up"})
 
 def save_uploaded_file(filename,file):
     directory = "board/data/"
@@ -56,7 +58,9 @@ def create(request):
     print ('Parent process pid:', os.getpid())
     PATH_TO_DATASET = '/files/data/users.dat'
     model_controller_obj = ModelManager('BPR', 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
-
+    
+    bod = json.loads(request.body.decode('utf-8'))
+    print("bod:", bod, type(bod))
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()
     p.join(2)
@@ -64,10 +68,8 @@ def create(request):
     try:
         generated_model_id = model_controller_obj.model_id
         err = "No err "
-        # return HttpResponse(str(generated_model_id + err))
         return JsonResponse({'generated_model_id': generated_model_id, 'err':err})
     except:
         print("Error in getting generated model-id")
         p.terminate() # Force terminate training
-        # return HttpResponse("Error in getting generated model-id")
         return JsonResponse({'generated_model_id': '', 'err':'Error in getting generated model-id'})

@@ -113,3 +113,6 @@ board/ctrsr_datasets/
 
 #upload dir
 board/data
+
+# React node modules
+node_modules

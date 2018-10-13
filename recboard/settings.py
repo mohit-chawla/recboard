@@ -25,6 +25,7 @@ SECRET_KEY = 'y@8xjx6dx9jyr)q@)5%%z7qyc-cc^g$!5#$8*ydgw17oyr2tx6'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+CSRF_COOKIE_NAME = "csrftoken"
 
 
 # Application definition
@@ -37,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'board.apps.BoardConfig',
+
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +50,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'recboard.urls'
@@ -54,7 +60,7 @@ ROOT_URLCONF = 'recboard.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR+"/board", 'templates')],
+        'DIRS': [os.path.join(BASE_DIR+"/board", 'templates'), os.path.join(BASE_DIR, 'build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,4 +128,5 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'board/static'),
+    os.path.join(BASE_DIR, 'build/static'),
 )
