@@ -86,13 +86,12 @@ def create_workspace(request):
     if not body or not "workspace_name" in body:
         HttpResponseBadRequest("Bad request")
     
-    user = get_dummy_user()
+    dummy = get_dummy_user()
+    user = db.get('user',name=dummy.name) #TODO: replace with actual user
     #TODO: replace with actual update op using addset for better perf
     user.workspaces.append(Workspace(name="workspacename2"))
     db.insert('user',user)
     return HttpResponse()
-
-
 
 
 class HomePage(TemplateView):
