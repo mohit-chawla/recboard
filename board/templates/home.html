@@ -11,7 +11,8 @@
         <meta charset="utf-8">
         {% load static %}
         <link href="{% static 'css/dropzone.css' %}" type="text/css" rel="stylesheet"/>
-    </head>
+        <link href="{% static 'css/board.css' %}" type="text/css" rel="stylesheet"/>
+    </head
     <body>
  
         <!-- IMPORTANT enctype attribute! -->
@@ -26,7 +27,108 @@
                 <span class="progress-text"></span>
             </div>
         </div>
- 
+
+        <hr>
+        <div id="datasets-div">
+            <h2>User datasets</h2>
+        </div>
+        <!-- Workspaces start here -->
+        <div id="workspaces-div">
+            <h2>User workspaces</h2>
+        </div> 
+        <!-- Workspaces end here -->
+        <script type="text/javascript">
+            var hostname = window.location.origin
+            var user_root_url  = hostname + "/board/user"
+            var workspace_root_url = user_root_url + "/workspace"
+            var dataset_root_url = user_root_url + "/dataset"
+            debug = true
+            var userDatasets = [];
+
+            function getWorkspaceList(){
+                url = workspace_root_url + "/list"
+                if (debug){
+                    console.log("listing workspaces",url)   
+                }
+                $.get( url, function( data ) {
+                  $.each(data,function( _ , workspace){
+                    addWorkspaceToUI(workspace)
+                  });
+                });
+            }
+
+            function getDatasetList(){
+                url = dataset_root_url + "/list"
+                if (debug){
+                    console.log("listing datasets",url)   
+                }
+                $.get( url, function( data ) {
+                    addDatasetsToUI(data)                    
+                    $.each(data,function( _ , dataset){
+                        userDatasets.push(dataset)
+                    });
+                    
+                });
+            }
+
+            function getAvailableRecommenders(){
+
+            }
+            function modelDatasetOptionsUI(){
+                options = ""
+                $.each(userDatasets, function(i,ds){
+                    options += "<option>"+ds+"</option>"
+                });
+                return options
+            }
+            function createModelForm(workspace){
+                options = modelDatasetOptionsUI()
+                return ' Create new Model <div class="createModel"> Recommender <select> <option>BPR</option></select> Dataset <select>'+modelDatasetOptionsUI()+'</select> <button class="trainModel">Train</button></div>'
+            }
+
+            function addWorkspaceToUI(workspace){
+                $("#workspaces-div").append('<div id='+workspace+' class="workspace"><h3>'+workspace+'</h3><hr class="workspace-hr"/><br/>'+createModelForm()+'</div>')
+            }
+
+            function addDatasetsToUI(datasets){
+                $("#datasets-div").empty()
+                $("#datasets-div").append('<h2>User datasets</h2>')
+                n = $(datasets).size()
+                if (n == 0){
+                    $("#datasets-div").append("No dataset, please upload new")
+                }
+                else{
+                    $.each(datasets, function(_, dataset){
+                        $("#datasets-div").append('<div>'+dataset+'</div>')       
+                    });
+                }
+            }
+            $(document).on('click', '.trainModel', function () {
+                if (debug){
+                    console.log("Training model ...")
+                }
+                
+                $.ajax({
+                    url : workspace_root_url+"/model/train",
+                    type: "POST",
+                    data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                    dataType : "json",
+                    success: function( data ){
+                        console.log("training requested ...")
+                    }
+                });
+            });
+            // var 
+            $(window).load(function(){
+                // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
+                getDatasetList(); 
+
+                getWorkspaceList();
+
+            });
+
+
+        </script>
         <script src="{% static 'js/dropzone.js' %}"></script>
         <script type="text/javascript">
             Dropzone.options.myDropzone = {

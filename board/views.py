@@ -55,13 +55,13 @@ def list_datasets(request):
     """Returns list of datasets"""
     user = get_dummy_user()
     u = db.get('user',name=user.name)
-    return HttpResponse([ds.name for ds in u.datasets])
+    return JsonResponse([ds.name for ds in u.datasets],safe=False)
 
 def list_workspaces(request):
     """Returns list of datasets"""
     user = get_dummy_user()
     u = db.get('user',name=user.name) #TODO: replace with actual user
-    return HttpResponse([workspace.name for workspace in u.workspaces])
+    return JsonResponse([workspace.name for workspace in u.workspaces],safe=False)
 
 def get_dummy_user():
     if len(db.select('user')) == 0:
