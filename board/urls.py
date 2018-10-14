@@ -9,7 +9,7 @@ urlpatterns = [
     path('upload', views.upload, name='upload'),
     url(r'^home/$', views.HomePage.as_view()),
     path('create', views.create, name='index'),
-    path('user/datasets/list',views.list_datasets,name='index'),
+    path('user/dataset/list',views.list_datasets,name='index'),
     path('user/workspace/create',views.create_workspace,name='index'),
     path('user/workspace/list',views.list_workspaces,name='index'),
 ]
