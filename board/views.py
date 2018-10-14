@@ -16,7 +16,7 @@ from .forms import UploadFileForm
 from .db import RecboardDB
 from .models import *
 import json
-
+from random import randint
 logging.getLogger(__name__)
 
 db = RecboardDB()
@@ -100,25 +100,57 @@ class HomePage(TemplateView):
     """
     template_name = 'home.html'
 
+LOG_DIR = "/Users/kay/recboard/model_summaries"
 
 def create(request):
     print ('Parent process pid:', os.getpid())
-    PATH_TO_DATASET = '/ctrsr_datasets/citeulike-a/users.dat'
+    PATH_TO_DATASET = '/files/data/users.dat'
     model_controller_obj = ModelManager('BPR', 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
-
+    
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()
     p.join(2)
 
-    try:
-        generated_model_id = model_controller_obj.model_id
-        err = "No err "
-        return HttpResponse(str(generated_model_id + err))
-    except:
-        print("Error in getting generated model-id")
-        p.terminate() # Force terminate training
-        return HttpResponse("Error in getting generated model-id")
+    # try:
+    generated_model_id = model_controller_obj.model_id
+    err = "No err "
+    user = get_dummy_user()
+    if not user.datasets: 
+        return JsonResponse({'msg':'No datasets found'})
+
+    if not user.workspaces:
+        user.workspaces.append(Workspace(name="workspacename2"))
+        db.insert('user',user)
+    
+    # TODO: maintain a list of available ports later
+    tensorboard_port = str(randint(6000,7000)) 
+    print("port generated", tensorboard_port,"Starting tb")
+
+    # TODO: add try catch here (in case the tensorboard couldnt be started)
+    
+    cmd = "tensorboard --logdir "+LOG_DIR+" --port "+tensorboard_port 
+    tb_p = Process(target=os.system, args=(cmd,))
+    tb_p.start()
+    tb_p.join(2)
+    
+    print("TB started")
+
+    model = Model(name="myModel",status="just created", dataset=user.datasets[0],logdir=LOG_DIR, port=tensorboard_port)
+    user.workspaces[-1].models.append(model)
+    db.insert('user',user)
+
+    return JsonResponse({'msg':tensorboard_port})
+    # except:
+    #     print("Error in getting generated model-id")
+    #     p.terminate() # Force terminate training
+    #     return JsonResponse({'msg':"Error in getting generated model-id"})
 
 
 if __name__ == "__main__":
     list_datasets()
+
+
+
+
+    
+    

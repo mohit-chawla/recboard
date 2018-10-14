@@ -107,9 +107,13 @@ venv.bak/
 # index checkpoints
 checkpoint
 *.ckpt.*
+bpr_recommender/
 
 # dataset
 board/ctrsr_datasets/
 
 #upload dir
 board/data
+
+# model summaries generated for tensorboard
+model_summaries/

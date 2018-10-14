@@ -3,6 +3,14 @@ import random
 import os
 import logging
 
+
+from openrec.utils import Dataset
+from openrec.utils.samplers import RandomPairwiseSampler
+from openrec.utils.samplers import EvaluationSampler
+from openrec.recommenders import BPR
+from openrec.utils.evaluators import AUC
+from openrec import ModelTrainer
+
 FORMAT = '%(asctime)-15s %(message)s'
 
 class ModelManager:
@@ -70,7 +78,7 @@ class ModelManager:
 
         self.logger.info('############ instantiating dataset.. ############')
 
-        from openrec.utils import Dataset
+        
 
         train_dataset = Dataset(raw_data=train_structured_arr,
                                 total_users=total_users, 
@@ -89,8 +97,7 @@ class ModelManager:
 
         self.logger.info("############ instantiating Samplers.. ############")
 
-        from openrec.utils.samplers import RandomPairwiseSampler
-        from openrec.utils.samplers import EvaluationSampler
+        
 
         train_sampler = RandomPairwiseSampler(batch_size=1000, 
                                             dataset=train_dataset, 
@@ -102,7 +109,7 @@ class ModelManager:
 
         self.logger.info("############ instantiating Recommender.. ############")
 
-        from openrec.recommenders import BPR
+        
 
         bpr_model = BPR(batch_size=1000, 
                         total_users=train_dataset.total_users(), 
@@ -114,14 +121,13 @@ class ModelManager:
 
 
         self.logger.info("############ instantiating Evaluator.. ############")
-
-        from openrec.utils.evaluators import AUC
+        
 
         auc_evaluator = AUC()
 
         self.logger.info("############ instantiating Model trainer.. ############")
 
-        from openrec import ModelTrainer
+        
 
         model_trainer = ModelTrainer(model=bpr_model)
 
