@@ -19,6 +19,7 @@ class Model(EmbeddedDocument):
 	status = StringField(max_length=120, required=True)
 	dataset = EmbeddedDocumentField(Dataset)
 	logdir = StringField(max_length=120, required=True)	
+	port = StringField(max_length=5, required=True)	
 	
 class Workspace(EmbeddedDocument):
 	name = StringField(max_length=120, required=True)
