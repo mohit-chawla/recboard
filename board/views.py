@@ -135,7 +135,7 @@ def create(request):
 
     # TODO: add try catch here (in case the tensorboard couldnt be started)
     
-    cmd = "tensorboard --logdir "+LOG_DIR+" --port "+tensorboard_port 
+    cmd = "tensorboard --logdir "+LOG_DIR+" --host localhost --port "+tensorboard_port 
     tb_p = Process(target=os.system, args=(cmd,))
     tb_p.start()
     tb_p.join(2)
