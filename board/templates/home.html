@@ -181,8 +181,9 @@
                         dataType : "json",
                         success: function( data ){
                             console.log("training requested ...",data)
-                            setTimeout(function(){ port = getTBPort()
-                            workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'" height="800px" width="100%"></iframe></div>') }, 3000);
+                            setTimeout(function(){ 
+                                port = data['msg']
+                            workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'" height="800px" width="100%"></iframe></div>') }, 10000);
                         }
                     });
                 });
