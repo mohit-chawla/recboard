@@ -12,7 +12,7 @@
         {% load static %}
         <link href="{% static 'css/dropzone.css' %}" type="text/css" rel="stylesheet"/>
         <link href="{% static 'css/board.css' %}" type="text/css" rel="stylesheet"/>
-        <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet"/>
+        <link href="{% static 'css/bootstrap.css' %}" type="text/css" rel="stylesheet"/>
         <script type="text/javascript" src="{% static 'css/dropzone.css' %}"></script>
     </head
     <body>
@@ -49,7 +49,13 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-6">
+                    <div id="datasets-div">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4 >Upload new dataset</h4>
+                    <hr>
                     <form class="dropzone" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
                         {% csrf_token %}
                     </form>
@@ -66,18 +72,20 @@
            
 
             <hr>
-            <div id="datasets-div">
-                <h2 >User datasets</h2>
-            </div>
+            
             <!-- Workspaces start here -->
-            <div id="create-workspace-div">
-                Create new workspace
-                <input type="text" name="workspace-name" id="new-workspace-name"/>
-                <button id="create-workspace-btn">Create Workspace</button>
-
+            <span class="glyphicon glyphicon-search"></span>
+            <h2>Workspaces</h2>
+            <hr>
+            <div class="row">
+                <div id="create-workspace-div" class="col-md-12">
+                    <h4>Create new workspace</h4>
+                    <input type="text" name="workspace-name" id="new-workspace-name"/>
+                    <button id="create-workspace-btn" >Create Workspace</button>
+                </div>
             </div>
-            <h2>User workspaces</h2>
-            <div id="workspaces-div">
+
+            <div id="workspaces-div" class="row">
             </div> 
             <!-- Workspaces end here -->
             <script type="text/javascript">
@@ -146,7 +154,7 @@
 
                 function addDatasetsToUI(datasets){
                     $("#datasets-div").empty()
-                    $("#datasets-div").append('<h2>User datasets</h2>')
+                    $("#datasets-div").append('<h4>Uploaded datasets</h4><hr>')
                     n = $(datasets).size()
                     if (n == 0){
                         $("#datasets-div").append("No dataset, please upload new")
@@ -181,9 +189,8 @@
                         dataType : "json",
                         success: function( data ){
                             console.log("training requested ...",data)
-                            setTimeout(function(){ 
-                                port = data['msg']
-                            workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'" height="800px" width="100%"></iframe></div>') }, 10000);
+                            port = data['msg']
+                            workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'" height="800px" width="100%"></iframe></div>')
                         }
                     });
                 });
@@ -259,6 +266,7 @@
                             // Actions that needed to be done after all uplaods complete
                             this.removeFile(file)
                             $(".progress-text").text("All uploads completed")
+                            getDatasetList(); 
                           }
                         });
 
