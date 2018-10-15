@@ -89,10 +89,17 @@ def create_workspace(request):
     dummy = get_dummy_user()
     user = db.get('user',name=dummy.name) #TODO: replace with actual user
     #TODO: replace with actual update op using addset for better perf
-    user.workspaces.append(Workspace(name="workspacename2"))
+    user.workspaces.append(Workspace(name=body['workspace_name']))
     db.insert('user',user)
-    return HttpResponse()
+    return JsonResponse([workspace.name for workspace in user.workspaces],safe=False)
 
+def get_model_port(request):
+    dummy = get_dummy_user()
+    user = db.get('user',name=dummy.name) #TODO: replace with actual user
+    #TODO: replace with actual update op using addset for better perf
+    if not user or not user.workspaces or not user.workspaces.models:
+        return HttpResponseBadRequest("No workspace or model")
+    return JsonResponse({"port":user.workspaces.models[-1].port})
 
 class HomePage(TemplateView):
     """
@@ -118,7 +125,6 @@ def create(request):
         print("Error in getting generated model-id")
         p.terminate() # Force terminate training
         return HttpResponse("Error in getting generated model-id")
-
 
 if __name__ == "__main__":
     list_datasets()
