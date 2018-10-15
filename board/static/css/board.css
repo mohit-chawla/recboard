@@ -1,0 +1,31 @@
+.top-buffer{
+	height:50px !important;
+}
+#workspaces-div{
+	background-color: #EEE;
+	padding: 0.5% 3% 1% 3%;
+}
+.workspace{
+	/*Div for each workspace*/
+	height:auto; /*Useful when iframe appended, to avoid overflow*/
+    /*min-height:500px;*/
+    width:95%;
+    background-color: #FFF;
+    padding: 2%;
+    border : 1px solid #DDD;
+}
+
+.workspace-hr{
+	background-color: #DDD;
+	height: 1px;
+	width: 80%;
+	float: left;
+	border: none;
+
+}
+
+.model-div{
+	border:solid 10px #eafeea;
+	padding:10px 10px 10px 10px;
+}
+

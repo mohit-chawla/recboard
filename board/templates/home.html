@@ -11,73 +11,271 @@
         <meta charset="utf-8">
         {% load static %}
         <link href="{% static 'css/dropzone.css' %}" type="text/css" rel="stylesheet"/>
-    </head>
+        <link href="{% static 'css/board.css' %}" type="text/css" rel="stylesheet"/>
+        <link href="{% static 'css/bootstrap.min.css' %}" type="text/css" rel="stylesheet"/>
+        <script type="text/javascript" src="{% static 'css/dropzone.css' %}"></script>
+    </head
     <body>
- 
-        <!-- IMPORTANT enctype attribute! -->
-        <form class="dropzone" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
-            {% csrf_token %}
-        </form>
-        <button id="upload-file">
-            Upload
-        </button>
-        <div class="progress">
-            <div class="progress-bar progress-bar-primary" role="progressbar" data-dz-uploadprogress>
-                <span class="progress-text"></span>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+          <div class="container">
+            <a class="navbar-brand" href="#">recboard</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+              <ul class="navbar-nav ml-auto">
+                <!-- <li class="nav-item active">
+                  <a class="nav-link" href="#">Home
+                    <span class="sr-only">(current)</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Services</a>
+                </li> -->
+                <li class="nav-item">
+                  <a class="nav-link" href="https://github.com/mohit-chawla/recboard">Github</a>
+                </li>
+              </ul>
             </div>
-        </div>
- 
-        <script src="{% static 'js/dropzone.js' %}"></script>
-        <script type="text/javascript">
-            Dropzone.options.myDropzone = {
-                acceptedFiles: ".xls,.csv,.xlsx",
-                maxFiles:1,
-                addRemoveLinks: true,
-                // Prevents Dropzone from uploading dropped files immediately
-                autoProcessQueue : false,
-                
-                accept: function(file, done) {
-                    console.log("uploaded");
-                    done();
-                },
-                
-                init: function() {
+          </div>
+        </nav>
+        <div class="container-fluid">
+            <!-- IMPORTANT enctype attribute! -->
+            <div class="row top-buffer">
+                <div class="col-md-12">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <form class="dropzone" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
+                        {% csrf_token %}
+                    </form>
+                    <button id="upload-file">
+                        Upload
+                    </button>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-primary" role="progressbar" data-dz-uploadprogress>
+                            <span class="progress-text"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
 
-                    myDropzone = this;
-                    var submitButton = document.querySelector("#upload-file")
-                    
-                    submitButton.addEventListener("click", function() {
-                        myDropzone.processQueue();
-                        // Tell Dropzone to process all queued files.
+            <hr>
+            <div id="datasets-div">
+                <h2 >User datasets</h2>
+            </div>
+            <!-- Workspaces start here -->
+            <div id="create-workspace-div">
+                Create new workspace
+                <input type="text" name="workspace-name" id="new-workspace-name"/>
+                <button id="create-workspace-btn">Create Workspace</button>
+
+            </div>
+            <h2>User workspaces</h2>
+            <div id="workspaces-div">
+            </div> 
+            <!-- Workspaces end here -->
+            <script type="text/javascript">
+                var hostname = window.location.origin
+                var user_root_url  = hostname + "/board/user"
+                var workspace_root_url = user_root_url + "/workspace"
+                var dataset_root_url = user_root_url + "/dataset"
+                debug = true
+                var userDatasets = [];
+
+                function getWorkspaceList(){
+                    url = workspace_root_url + "/list"
+                    if (debug){
+                        console.log("listing workspaces",url)   
+                    }
+                    $.get( url, function( workspaces ) {
+                        addWorkspacesToUI(workspaces)
                     });
+                }
 
-                    this.on("maxfilesexceeded", function(file){
-                        alert("You can upload only one dataset at a time.");
-                        this.removeFile(file)
+                function getDatasetList(){
+                    url = dataset_root_url + "/list"
+                    if (debug){
+                        console.log("listing datasets",url)   
+                    }
+                    $.get( url, function( data ) {
+                        addDatasetsToUI(data)                    
+                        $.each(data,function( _ , dataset){
+                            userDatasets.push(dataset)
+                        });
+                        
                     });
+                }
 
-                    this.on("complete", function (file) {
-                      if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
-                        // Actions that needed to be done after all uplaods complete
-                        this.removeFile(file)
-                        $(".progress-text").text("All uploads completed")
-                      }
+
+                function getAvailableRecommenders(){
+                    //TODO
+                }
+
+                function modelDatasetOptionsUI(){
+                    options = ""
+                    $.each(userDatasets, function(i,ds){
+                        options += "<option>"+ds+"</option>"
                     });
+                    return options
+                }
 
+                function createModelForm(workspace){
+                    //Creates form to create a model in workspace
+                    options = modelDatasetOptionsUI()
+                    return ' Create new Model <div class="createModel"> Recommender <select> <option>BPR</option></select> Dataset <select>'+modelDatasetOptionsUI()+'</select> <button class="trainModel">Train</button></div>'
+                }
+
+                function addWorkspacesToUI(workspaces){
+                    //clear existing workspaces
+                    $.each(workspaces,function(_,workspace){
+                        addWorkspaceToUI(workspace)
+                    });
+                }
                 
-                },
+                function addWorkspaceToUI(workspace){
+                    //add single workspace to UI
+                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace"><h3>'+workspace+'</h3><hr class="workspace-hr"/><br/>'+createModelForm()+'</div>')
+                }
 
-                //shows upload progress bar
-                uploadprogress: function(file, progress, bytesSent) {
-                    if (file.previewElement) {
-                        progressElement = file.previewElement.querySelector("[data-dz-uploadprogress]");
-                        progressElement.style.width = progress + "%";
-                        $(".progress-text").text(progress + "%")
+
+                function addDatasetsToUI(datasets){
+                    $("#datasets-div").empty()
+                    $("#datasets-div").append('<h2>User datasets</h2>')
+                    n = $(datasets).size()
+                    if (n == 0){
+                        $("#datasets-div").append("No dataset, please upload new")
+                    }
+                    else{
+                        $.each(datasets, function(_, dataset){
+                            $("#datasets-div").append('<div>'+dataset+'</div>')       
+                        });
                     }
                 }
 
-            };
-        </script>
+                function getTBPort(){
+                    // Get port of tensorboard for this model
+                    url = workspace_root_url + "/model/port"
+                    $.get( url, function( data ) {
+                        console.log("retrieved port ..",data['port'])
+                        return data["port"]
+                    });
+                }
+                // Train a model
+                $(document).on('click', '.trainModel', function (e) {
+                    if (debug){
+                        console.log("Training model ...",)
+                        var workspaces_div = $(this).parent().parent() // get div of model from which this train btn was clicked
+
+                        
+                    }
+                    $.ajax({
+                        url : workspace_root_url+"/model/train",
+                        type: "POST",
+                        data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                        dataType : "json",
+                        success: function( data ){
+                            console.log("training requested ...",data)
+                            setTimeout(function(){ port = getTBPort()
+                            workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'" height="800px" width="100%"></iframe></div>') }, 3000);
+                        }
+                    });
+                });
+
+                  $.ajaxSetup({beforeSend: function(xhr, settings){
+                    xhr.setRequestHeader('X-CSRFToken', 
+                                         '{{ csrf_token }}');
+                  }});
+                
+
+                // Create new workspace
+                $(document).on('click', '#create-workspace-btn', function () {
+                    var new_workspace_name = $("#new-workspace-name").val()
+                    if (new_workspace_name != ""){
+                        if (debug){
+                            console.log("Creating new workspace ...", new_workspace_name)
+                        }
+                        $.ajax({
+                            url : workspace_root_url+"/create",
+                            type: "POST",
+                            data : JSON.stringify({workspace_name:new_workspace_name}),
+                            dataType : "json",
+                            success: function( newWorkspaceList ){
+                                console.log("workspace created ..., updating UI")
+                                addWorkspaceToUI(new_workspace_name)
+                            }
+                        });
+                    }
+                });
+
+                // var 
+                $(window).load(function(){
+                    // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
+                    getDatasetList(); 
+
+                    getWorkspaceList();
+
+                });
+
+
+            </script>
+            <script src="{% static 'js/dropzone.js' %}"></script>
+            <script type="text/javascript">
+                Dropzone.options.myDropzone = {
+                    acceptedFiles: ".xls,.csv,.xlsx",
+                    maxFiles:1,
+                    addRemoveLinks: true,
+                    // Prevents Dropzone from uploading dropped files immediately
+                    autoProcessQueue : false,
+                    
+                    accept: function(file, done) {
+                        console.log("uploaded");
+                        done();
+                    },
+                    
+                    init: function() {
+
+                        myDropzone = this;
+                        var submitButton = document.querySelector("#upload-file")
+                        
+                        submitButton.addEventListener("click", function() {
+                            myDropzone.processQueue();
+                            // Tell Dropzone to process all queued files.
+                        });
+
+                        this.on("maxfilesexceeded", function(file){
+                            alert("You can upload only one dataset at a time.");
+                            this.removeFile(file)
+                        });
+
+                        this.on("complete", function (file) {
+                          if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                            // Actions that needed to be done after all uplaods complete
+                            this.removeFile(file)
+                            $(".progress-text").text("All uploads completed")
+                          }
+                        });
+
+                    
+                    },
+
+                    //shows upload progress bar
+                    uploadprogress: function(file, progress, bytesSent) {
+                        if (file.previewElement) {
+                            progressElement = file.previewElement.querySelector("[data-dz-uploadprogress]");
+                            progressElement.style.width = progress + "%";
+                            $(".progress-text").text(progress + "%")
+                        }
+                    }
+
+                };
+            </script>
+        </div>
     </body>
 </html>
 
