@@ -111,6 +111,7 @@ bpr_recommender/
 
 # dataset
 board/ctrsr_datasets/
+board/files/data/users.dat
 
 #upload dir
 board/data
