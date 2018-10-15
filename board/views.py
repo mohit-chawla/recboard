@@ -100,7 +100,7 @@ class HomePage(TemplateView):
     """
     template_name = 'home.html'
 
-LOG_DIR = "/Users/kay/recboard/model_summaries"
+LOG_DIR = os.environ['RBROOT']+"/model_summaries"
 
 def create(request):
     print ('Parent process pid:', os.getpid())
@@ -148,9 +148,4 @@ def create(request):
 
 if __name__ == "__main__":
     list_datasets()
-
-
-
-
-    
     
