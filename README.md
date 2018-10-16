@@ -34,7 +34,7 @@ We know react has faster rendering and other benefits. But it has a steep learni
 You might want to read [this](https://github.com/mohit-chawla/recboard/wiki).
 
 **Other**
-Feel free to roast [link](mc2683@cornell.edu or [link](ks2259@cornell.edu)
+Feel free to roast [link](mc2683@cornell.edu) or [link](ks2259@cornell.edu)
 
 ### **Stack we are using**
 
