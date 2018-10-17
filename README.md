@@ -1,6 +1,8 @@
 
 # recboard - Recommendation models as a service [![CircleCI](https://circleci.com/gh/mohit-chawla/recboard.svg?style=svg)](https://circleci.com/gh/mohit-chawla/recboard)
 
+![recboard](http://www.mohitchawla.in/images/recboard.png)
+
 Recboard aims to provide recommedation models as a service. We use [openrec](http://openrec.ai) (Check it out, its cool!) for modular recommendation systems.
 
 ### **Objectives:**
