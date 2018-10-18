@@ -5,9 +5,10 @@ from django.conf.urls import url
 
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.Index.as_view(), name='index'),
+    path('home/login', views.login_user),
     path('upload', views.upload, name='upload'),
-    url(r'^home/$', views.HomePage.as_view()),
+    url(r'^home/$', views.HomePage.as_view(), name='home'),
     path('user/workspace/model/train', views.create, name='index'),
     path('user/workspace/model/port', views.get_model_port, name='index'),
     path('user/dataset/list',views.list_datasets,name='index'),
