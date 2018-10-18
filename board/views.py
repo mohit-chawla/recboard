@@ -14,6 +14,7 @@ import logging
 from .forms import UploadFileForm
 # from .models import UploadFile
 from .db import RecboardDB
+from constants import *
 from .models import *
 import json
 from random import randint
@@ -107,7 +108,6 @@ class HomePage(TemplateView):
     """
     template_name = 'home.html'
 
-LOG_DIR = os.environ['RBROOT']+"/model_summaries"
 
 def create(request):
     print ('Parent process pid:', os.getpid())
