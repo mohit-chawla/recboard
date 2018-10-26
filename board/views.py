@@ -25,6 +25,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
+from openrec import recommenders
+
 logging.getLogger(__name__)
 
 db = RecboardDB()
@@ -95,6 +97,15 @@ def list_workspaces(request):
     user = get_dummy_user()
     u = db.get('user',name=user.name) #TODO: replace with actual user
     return JsonResponse([workspace.name for workspace in u.workspaces],safe=False)
+
+
+def list_recommenders(request):
+    """List available recommenders with openrec"""
+    _recs = []
+    for func in dir(recommenders):
+        if callable(getattr(recommenders, func)) and func.lower()!="recommender":
+            _recs.append(func)
+    return JsonResponse(_recs,safe=False)
 
 def get_dummy_user():
     if len(db.select('user')) == 0:
