@@ -9,9 +9,11 @@ urlpatterns = [
     path('home/login', views.login_user),
     path('upload', views.upload, name='upload'),
     url(r'^home/$', views.HomePage.as_view(), name='home'),
+    path('user/workspace/recommender/list',views.list_recommenders,name='recommenders'),
     path('user/workspace/model/train', views.create, name='index'),
     path('user/workspace/model/port', views.get_model_port, name='index'),
     path('user/dataset/list',views.list_datasets,name='index'),
     path('user/workspace/create',views.create_workspace,name='index'),
     path('user/workspace/list',views.list_workspaces,name='index'),
+
 ]

@@ -25,6 +25,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
+from openrec import recommenders
+
 logging.getLogger(__name__)
 
 db = RecboardDB()
@@ -96,6 +98,15 @@ def list_workspaces(request):
     u = db.get('user',name=user.name) #TODO: replace with actual user
     return JsonResponse([workspace.name for workspace in u.workspaces],safe=False)
 
+
+def list_recommenders(request):
+    """List available recommenders with openrec"""
+    _recs = []
+    for func in dir(recommenders):
+        if callable(getattr(recommenders, func)) and func.lower()!="recommender":
+            _recs.append(func)
+    return JsonResponse(_recs,safe=False)
+
 def get_dummy_user():
     if len(db.select('user')) == 0:
         create_dummy_user()
@@ -142,8 +153,19 @@ class HomePage(TemplateView):
 
 
 def create(request):
+
+    body = get_request_body(request)
+    if not body or not "workspace_name" in body:
+        return HttpResponseBadRequest("Bad request")
+
+    if not 'recommender' in body:
+        return HttpResponseBadRequest("Bad request")
+
+    recommender = body['recommender']
+
     print ('Parent process pid:', os.getpid())
-    model_controller_obj = ModelManager('BPR', 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
+    
+    model_controller_obj = ModelManager(recommender, 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
     
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()
