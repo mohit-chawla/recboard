@@ -190,7 +190,10 @@
                         success: function( data ){
                             console.log("training requested ...",data)
                             port = data['msg']
-                            workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'" height="800px" width="100%"></iframe></div>')
+                            setTimeout(function(){
+                                workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'"height="800px" width="100%"></iframe></div>') 
+                            },10000);
+                            
                         }
                     });
                 });
