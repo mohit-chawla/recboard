@@ -153,19 +153,21 @@ class HomePage(TemplateView):
 
 
 def create(request):
-
     body = get_request_body(request)
-    if not body or not "workspace_name" in body:
-        return HttpResponseBadRequest("Bad request")
 
-    if not 'recommender' in body:
+    if not 'recommender' in body or not 'train_dataset' in body:
         return HttpResponseBadRequest("Bad request")
 
     recommender = body['recommender']
 
     print ('Parent process pid:', os.getpid())
+    user = get_dummy_user()
+    body = get_request_body(request)
     
-    model_controller_obj = ModelManager(recommender, 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
+    # TODO: ensure user.id is not None
+    dataset_path = DATASET_PATH_PREFIX+str(user.id)+"_file_"+body['train_dataset']
+    print("\n\n Fetching dataset from path = ", dataset_path ,"\n\n")
+    model_controller_obj = ModelManager(recommender, 'train_samp', 'val_samp', 'test_samp', 'AUC', dataset_path)
     
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()
