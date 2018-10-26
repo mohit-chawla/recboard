@@ -13,9 +13,9 @@ Recboard plans to satisfy the following objectives:
 
 
 ### **Contrbutions**
-This project is not open for contributions, as of now. 
+This project is **not** open for contributions, as of now. 
 This is a semester project, for now.
-Once we have a PoC that resonates well with users, we will clean (some / all) code and then open this for contributions. :)
+Once we have a PoC that resonates well with users and matches expected performance, then we will open this repo for contributions. :)
 
 ### **Wiki**
 
@@ -26,7 +26,7 @@ All fun stuff [here](https://github.com/mohit-chawla/recboard/wiki)
 
 **Why are we not using golang?** 
 
-We know that golang would have been a better choice considering mem usage of goroutines but we constrained due to human factors (experience, community here, libraries we are using and most importantly time [This is supposed to a PoC, for now.].).
+We know that golang would have been a better choice considering better parallelism via goroutines but we are constrained due to human factors (experience, community here, libraries we are using and most importantly time [This is supposed to a PoC, for now.].).
 
 **If you are using python, Why no react?**
 
