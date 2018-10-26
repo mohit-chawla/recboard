@@ -163,8 +163,6 @@ def create(request):
     print ('Parent process pid:', os.getpid())
     user = get_dummy_user()
     body = get_request_body(request)
-    if not body or not "workspace_name" in body:
-        HttpResponseBadRequest("Bad request")
     
     # TODO: ensure user.id is not None
     dataset_path = DATASET_PATH_PREFIX+str(user.id)+"_file_"+body['train_dataset']
