@@ -153,12 +153,9 @@ class HomePage(TemplateView):
 
 
 def create(request):
-
     body = get_request_body(request)
-    if not body or not "workspace_name" in body:
-        return HttpResponseBadRequest("Bad request")
 
-    if not 'recommender' in body:
+    if not 'recommender' in body or not 'train_dataset' in body:
         return HttpResponseBadRequest("Bad request")
 
     recommender = body['recommender']
