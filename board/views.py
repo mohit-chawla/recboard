@@ -153,8 +153,19 @@ class HomePage(TemplateView):
 
 
 def create(request):
+
+    body = get_request_body(request)
+    if not body or not "workspace_name" in body:
+        return HttpResponseBadRequest("Bad request")
+
+    if not 'recommender' in body:
+        return HttpResponseBadRequest("Bad request")
+
+    recommender = body['recommender']
+
     print ('Parent process pid:', os.getpid())
-    model_controller_obj = ModelManager('BPR', 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
+    
+    model_controller_obj = ModelManager(recommender, 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
     
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()

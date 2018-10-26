@@ -95,6 +95,7 @@
                 var dataset_root_url = user_root_url + "/dataset"
                 debug = true
                 var userDatasets = [];
+                var availableRecommdenders = [];
 
                 function getWorkspaceList(){
                     url = workspace_root_url + "/list"
@@ -123,8 +124,19 @@
                 }
 
 
-                function getAvailableRecommenders(){
-                    //TODO
+                function getAvailableRecommenders(cb){
+                    url = workspace_root_url + "/recommender/list"
+                    if (debug){
+                        console.log("listing available recommenders",url)   
+                    }
+                    $.get( url, function( data ) {
+                        $.each(data,function( _ , dataset){
+                            availableRecommdenders.push(dataset)
+                        });
+                        if(cb && typeof cb === "function") {
+                            cb();
+                        }
+                    });
                 }
 
                 function modelDatasetOptionsUI(){
@@ -135,10 +147,18 @@
                     return options
                 }
 
+                function modelRecommenderOptionsUI(){
+                    options = ""
+                    $.each(availableRecommdenders, function(i,recommender){
+                        options += "<option>"+recommender+"</option>"
+                    });
+                    return options  
+                }
+
                 function createModelForm(workspace){
                     //Creates form to create a model in workspace
                     options = modelDatasetOptionsUI()
-                    return ' Create new Model <div class="createModel"> Recommender <select> <option>BPR</option></select> Dataset <select>'+modelDatasetOptionsUI()+'</select> <button class="trainModel">Train</button></div>'
+                    return ' Create new Model <div class="createModel"> Recommender <select class="recommenderSelect"> '+modelRecommenderOptionsUI()+'</select> Dataset <select>'+modelDatasetOptionsUI()+'</select> <button class="trainModel">Train</button></div>'
                 }
 
                 function addWorkspacesToUI(workspaces){
@@ -184,10 +204,13 @@
 
                         
                     }
+                    
+                    selectedRecommender = $(this).siblings('.recommenderSelect').find(":selected").text()
+
                     $.ajax({
                         url : workspace_root_url+"/model/train",
                         type: "POST",
-                        data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                        data : JSON.stringify({csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,'recommender':selectedRecommender}),
                         dataType : "json",
                         success: function( data ){
                             console.log("training requested ...",data)
@@ -229,8 +252,7 @@
                 // var 
                 $(window).load(function(){
                     // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
-                    getDatasetList(getWorkspaceList); 
-
+                    getAvailableRecommenders(getDatasetList(getWorkspaceList));                    
                 });
 
 
