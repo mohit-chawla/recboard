@@ -143,7 +143,15 @@ class HomePage(TemplateView):
 
 def create(request):
     print ('Parent process pid:', os.getpid())
-    model_controller_obj = ModelManager('BPR', 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
+    user = get_dummy_user()
+    body = get_request_body(request)
+    if not body or not "workspace_name" in body:
+        HttpResponseBadRequest("Bad request")
+    
+    # TODO: ensure user.id is not None
+    dataset_path = DATASET_PATH_PREFIX+str(user.id)+"_file_"+body['train_dataset']
+    print("\n\n Fetching dataset from path = ", dataset_path ,"\n\n")
+    model_controller_obj = ModelManager('BPR', 'train_samp', 'val_samp', 'test_samp', 'AUC', dataset_path)
     
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()

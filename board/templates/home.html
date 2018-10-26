@@ -138,7 +138,7 @@
                 function createModelForm(workspace){
                     //Creates form to create a model in workspace
                     options = modelDatasetOptionsUI()
-                    return ' Create new Model <div class="createModel"> Recommender <select> <option>BPR</option></select> Dataset <select>'+modelDatasetOptionsUI()+'</select> <button class="trainModel">Train</button></div>'
+                    return ' Create new Model <div class="createModel"> Recommender <select> <option>BPR</option></select> Dataset <select class="datasetSelect">'+modelDatasetOptionsUI()+'</select> <button class="trainModel">Train</button></div>'
                 }
 
                 function addWorkspacesToUI(workspaces){
@@ -187,7 +187,9 @@
                     $.ajax({
                         url : workspace_root_url+"/model/train",
                         type: "POST",
-                        data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                        data : JSON.stringify({
+                                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value, train_dataset: $(this).siblings('.datasetSelect').find(':selected').text(),
+                            }),
                         dataType : "json",
                         success: function( data ){
                             console.log("training requested ...",data)
