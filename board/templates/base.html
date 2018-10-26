@@ -24,6 +24,7 @@
 		{% block head_css %}
 			{% block head_css_site %}
 			   <link href="{{STATIC_URL}}/static/css/bootstrap.css" type="text/css" rel="stylesheet"/>
+			   <link href="{{STATIC_URL}}/static/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
 			   <link href="{{STATIC_URL}}/static/css/board.css" type="text/css" rel="stylesheet"/>
 			{% endblock head_css_site %}
 			{% block head_css_section %}{% endblock head_css_section %}
@@ -59,8 +60,7 @@
 					<li class="nav-item">
 					  <a class="nav-link" href="https://github.com/mohit-chawla/recboard">Github</a>
 					</li>
-					{% if user.is_authenticated %}
-					  Hi {{ user.username }}!
+					{% if user.is_authenticated %}					
 					  {% block log_out %}
 						<li class="nav-item">
 						  <a class="nav-link" href="{% url 'logout' %}">logout</a>
@@ -78,7 +78,6 @@
 		</div>
 		<div id="site-wrapper">
 			{% if user.is_authenticated %}
-			  Hi {{ user.username }}!
 			  {% block content %}
 				This is base html, if you see this, something is wrong!
 			{% endblock content %}
