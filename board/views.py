@@ -14,17 +14,48 @@ import logging
 from .forms import UploadFileForm
 # from .models import UploadFile
 from .db import RecboardDB
+from .constants import *
 from .models import *
 import json
 from random import randint
+
+from django.shortcuts import render_to_response,redirect
+from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
 logging.getLogger(__name__)
 
 db = RecboardDB()
 conn = db.connection    
 
 
-def index(request):
-    return HttpResponse("All good, server is up")
+# def index(request):
+#     return HttpResponse("All good, server is up")
+
+class Index(TemplateView):
+    """
+        This is a class based view for home page (/home)
+    """
+    template_name = 'index.html'
+
+
+def login_user(request):
+    logout(request)
+    username = password = ''
+    context = {}
+    if request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect(BOARD_HOME)
+    return redirect(BOARD_HOME)
+
 
 def save_uploaded_file(user,filename,file):
     directory = "board/data/"
@@ -40,6 +71,7 @@ def save_uploaded_file(user,filename,file):
         db.insert('user',user)  #update user doc
         logging.info("Uploaded file saved","file:",filename,"location:",destination)
 
+@login_required(login_url=BOARD_HOME)
 def upload(request):
     user = get_dummy_user() #TODO: replace this with actual logged in user later
     if request.method == 'POST':
@@ -51,6 +83,7 @@ def upload(request):
         return HttpResponseBadRequest("Bad request")
     return HttpResponse("Uploaded")
 
+@login_required(login_url=BOARD_HOME)
 def list_datasets(request):
     """Returns list of datasets"""
     user = get_dummy_user()
@@ -107,11 +140,9 @@ class HomePage(TemplateView):
     """
     template_name = 'home.html'
 
-LOG_DIR = os.environ['RBROOT']+"/model_summaries"
 
 def create(request):
     print ('Parent process pid:', os.getpid())
-    PATH_TO_DATASET = '/files/data/users.dat'
     model_controller_obj = ModelManager('BPR', 'train_samp', 'val_samp', 'test_samp', 'AUC', PATH_TO_DATASET)
     
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
