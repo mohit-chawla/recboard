@@ -106,7 +106,7 @@
                     });
                 }
 
-                function getDatasetList(){
+                function getDatasetList(cb){
                     url = dataset_root_url + "/list"
                     if (debug){
                         console.log("listing datasets",url)   
@@ -116,7 +116,9 @@
                         $.each(data,function( _ , dataset){
                             userDatasets.push(dataset)
                         });
-                        
+                        if(cb && typeof cb === "function") {
+                            cb();
+                        }
                     });
                 }
 
@@ -227,9 +229,7 @@
                 // var 
                 $(window).load(function(){
                     // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
-                    getDatasetList(); 
-
-                    getWorkspaceList();
+                    getDatasetList(getWorkspaceList); 
 
                 });
 
