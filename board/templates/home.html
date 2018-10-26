@@ -4,7 +4,6 @@
 {% block content %}  
 
     {# Hero Section #}  
-    <b>This is Home page</b>
     {# Main Section #}
     <head>
         <meta charset="utf-8">
@@ -28,16 +27,19 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#">About</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Services</a>
                 </li> -->
                 <li class="nav-item">
                   <a class="nav-link" href="https://github.com/mohit-chawla/recboard">Github</a>
                 </li>
+                {% if user.is_authenticated %}
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'logout' %}">logout</a>
+                  <a class="nav-link active" href="#"><i class="fa fa-user-circle"></i> {{ user.username }}</a>
+                </li> 
+                
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'logout' %}"> Log out</a>
                 </li>
+                {% endif %}
               </ul>
             </div>
           </div>
@@ -59,8 +61,8 @@
                     <form class="dropzone" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
                         {% csrf_token %}
                     </form>
-                    <button id="upload-file">
-                        Upload
+                    <button id="upload-file" class="btn btn-secondary">
+                        Upload <i class="fa fa-cloud-upload"></i>
                     </button>
                     <div class="progress">
                         <div class="progress-bar progress-bar-primary" role="progressbar" data-dz-uploadprogress>
@@ -81,7 +83,7 @@
                 <div id="create-workspace-div" class="col-md-12">
                     <h4>Create new workspace</h4>
                     <input type="text" name="workspace-name" id="new-workspace-name"/>
-                    <button id="create-workspace-btn" >Create Workspace</button>
+                    <button id="create-workspace-btn" class="btn btn-secondary">Create Workspace <i class="fa fa-plus"></i></button>
                 </div>
             </div>
 
@@ -138,7 +140,7 @@
                 function createModelForm(workspace){
                     //Creates form to create a model in workspace
                     options = modelDatasetOptionsUI()
-                    return ' Create new Model <div class="createModel"> Recommender <select> <option>BPR</option></select> Dataset <select>'+modelDatasetOptionsUI()+'</select> <button class="trainModel">Train</button></div>'
+                    return ' Create new Model <div class="createModel"> Recommender <select> <option>BPR</option></select> Dataset <select>'+modelDatasetOptionsUI()+'</select> <button class="trainModel btn btn-primary">Train <i class="fa fa-superpowers"></i></button></div>'
                 }
 
                 function addWorkspacesToUI(workspaces){
@@ -150,7 +152,7 @@
                 
                 function addWorkspaceToUI(workspace){
                     //add single workspace to UI
-                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace"><h3>'+workspace+'</h3><hr class="workspace-hr"/><br/>'+createModelForm()+'</div>')
+                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace"><h3>'+workspace+'</h3> <hr class="workspace-hr"/><br/>'+createModelForm()+' <span style="float:right"> <i class="fa fa-trash" style="color:#800000"></i></span></div>')
                 }
 
 
@@ -163,7 +165,7 @@
                     }
                     else{
                         $.each(datasets, function(_, dataset){
-                            $("#datasets-div").append('<div>'+dataset+'</div>')       
+                            $("#datasets-div").append('<div> <i class="fa fa-file" style="color:#7ec0ee"></i> '+dataset+'</div>')       
                         });
                     }
                 }
