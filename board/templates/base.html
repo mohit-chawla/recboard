@@ -26,6 +26,7 @@
 			   <link href="{{STATIC_URL}}/static/css/bootstrap.css" type="text/css" rel="stylesheet"/>
 			   <link href="{{STATIC_URL}}/static/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
 			   <link href="{{STATIC_URL}}/static/css/board.css" type="text/css" rel="stylesheet"/>
+			   <link href="{{STATIC_URL}}/static/css/floating-labels.css" type="text/css" rel="stylesheet"/>
 			{% endblock head_css_site %}
 			{% block head_css_section %}{% endblock head_css_section %}
 			{% block head_css_page %}{% endblock head_css_page %}
@@ -72,17 +73,18 @@
 			  </div>
 			</nav>
 		{# The Document Body #}
-		<div class="row top-buffer">
-		    <div class="col-md-12">
-		    </div>
-		</div>
-		<div id="site-wrapper">
-			{% if user.is_authenticated %}
-			  {% block content %}
+		{% if user.is_authenticated %}
+			<div id="site-wrapper">
+				<div class="row top-buffer">
+				    <div class="col-md-12">
+				    </div>
+				</div>
+			</div>
+			{% block content %}
 				This is base html, if you see this, something is wrong!
 			{% endblock content %}
 			{% else %}
-				<div class="container-fluid">
+				<!-- <div class="container-fluid">
 					<div class="row top-buffer">
 					    <div class="col-md-12">
 					    </div>
@@ -116,14 +118,43 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				</div> -->
+				<form id="login" class="form-signin" name="LoginForm" action="login" method="post">
+				{% csrf_token %}
+				{% if next %}
+				    <input type="hidden" name="next" value="{{ next }}" />
+				{% endif %}
+			      <div class="text-center mb-4">
+			        <img class="mb-4" src="{{STATIC_URL}}/static/brand/recboard.png" alt="" width="60" height="60">
+			        <h1 class="h3 mb-3 font-weight-normal">recboard</h1>
+			        <!-- <p>Build form controls with floating labels via the <code>:placeholder-shown</code> pseudo-element. <a href="https://caniuse.com/#feat=css-placeholder-shown">Works in latest Chrome, Safari, and Firefox.</a></p> -->
+			      </div>
+
+			      <div class="form-label-group">
+			        <input type="text" id="username" name="username" class="form-control" placeholder="Email address" required autofocus  action="login" method="post">
+			        <label for="username">Username</label>
+			      </div>
+
+			      <div class="form-label-group">
+			        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+			        <label for="password">Password</label>
+			      </div>
+
+			      <div class="checkbox mb-3">
+			        <label>
+			          <input type="checkbox" value="remember-me"> Remember me
+			        </label>
+			      </div>
+			      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+			      <p class="mt-5 mb-3 text-muted text-center">&copy; Recboard 2018</p>
+			    </form>
 			{% endif %}
 			
-		</div>
+		
 		{# The Footer #}
-		<div class="footer">
-			<div class="container">
-				<p>Recboard Footer</p>
-			</div>
-		</div>
+		<!-- <footer class="text-muted">
+		      <div class="container-fluid">
+		        Check it out
+		      </div>
+		    </footer> -->
 	</body>

@@ -60,10 +60,11 @@ def login_user(request):
 
 
 def save_uploaded_file(user,filename,file):
-    directory = "board/data/"
+    directory = "data/"
     if not os.path.exists(directory):
         print("making dir ...")
         os.makedirs(directory)
+    print("saving file:", directory+str(user.id) + "_file_" + filename)
     with open(directory+str(user.id) + "_file_" + filename, 'wb+') as destination:
         #use chunks instead of read to avoid having large files in memory
         for chunk in file.chunks():

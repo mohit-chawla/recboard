@@ -14,7 +14,7 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
           <div class="container">
-            <a class="navbar-brand" href="#">recboard</a>
+            <a class="navbar-brand" href="#"><img src="{% static 'brand/recboard.png' %} " height="25px" width="25px" > <span class="text-muted"> | </span> recboard</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -161,7 +161,7 @@
                     //Creates form to create a model in workspace
                     options = modelDatasetOptionsUI()
 
-                    return ' Create new Model <div class="createModel"> Recommender <select class="recommenderSelect"> '+modelRecommenderOptionsUI()+'</select> Dataset <select>'+modelDatasetOptionsUI()+'</select> <button class="trainModel btn btn-primary">Train <i class="fa fa-superpowers"></i></button> </div>'
+                    return ' Create new Model <div class="createModel"> Recommender <select class="recommenderSelect"> '+modelRecommenderOptionsUI()+'</select> Dataset <select class="datasetSelect">'+modelDatasetOptionsUI()+'</select> <button class="trainModel btn btn-primary">Train <i class="fa fa-superpowers"></i></button> </div>'
                 }
 
                 function addWorkspacesToUI(workspaces){
@@ -209,12 +209,13 @@
                     }
                     
                     selectedRecommender = $(this).siblings('.recommenderSelect').find(":selected").text()
-
+                    selectedDataset = $(this).siblings('.datasetSelect').find(':selected').text()
                     $.ajax({
                         url : workspace_root_url+"/model/train",
                         type: "POST",
                         data : JSON.stringify({
-                                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value, train_dataset: $(this).siblings('.datasetSelect').find(':selected').text(),
+                                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                                train_dataset: selectedDataset,
                                 recommender: selectedRecommender,
                             }),
                         dataType : "json",
@@ -250,6 +251,7 @@
                             success: function( newWorkspaceList ){
                                 console.log("workspace created ..., updating UI")
                                 addWorkspaceToUI(new_workspace_name)
+                                $("#new-workspace-name").val("")
                             }
                         });
                     }
