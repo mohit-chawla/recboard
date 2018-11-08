@@ -174,7 +174,7 @@
                 
                 function addWorkspaceToUI(workspace){
                     //add single workspace to UI
-                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace col-md-12"><h3>'+workspace+'</h3> <hr class="workspace-hr col-md-12"/><br/> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"> <i class="fa fa-trash" style="color:#800000"></i></span></div>')
+                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h3>'+workspace+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" style="color:#ffcd00"></i></span> <i class="fa fa-trash" style="color:#800000"></i> </div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span></span></div>')
                 }
 
                 function datasetUIOptions(){
@@ -322,6 +322,20 @@
                     }
 
                 };
+                // $(".minimize").on('click',function(e){
+                //     alert('hi')
+                //     $(this).parent().slideToggle()
+                // });
+                $(document).on('click','.toggleWorkspace',function(e) {
+                  //handler code here
+                  if($(this).html() == '<i class="fa fa-window-maximize" style="color:#ffcd00"></i>'){
+                          $(this).html('<i class="fa fa-window-minimize" style="color:#ffcd00"></i>');
+                      }
+                      else{
+                          $(this).html('<i class="fa fa-window-maximize" style="color:#ffcd00"></i>');
+                      }
+                  $(this).parent().parent().siblings('.workspace-body').slideToggle()
+                });
             </script>
         </div>
     </body>
