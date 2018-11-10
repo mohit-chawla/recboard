@@ -11,51 +11,52 @@
         <link href="{% static 'css/dropzone.css' %}" type="text/css" rel="stylesheet"/>
         <script type="text/javascript" src="{% static 'js/dropzone.js' %}"></script>
     </head>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#"><img src="{% static 'brand/recboard.png' %} " height="25px" width="25px" > <span class="text-muted"> | </span> recboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home
+                <span class="sr-only">(current)</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/mohit-chawla/recboard">Github</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link active" href="#"><i class="fa fa-user-circle"></i> {{ user.username }}</a>
+            </li> 
+            
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}"> Log out</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-          <div class="container">
-            <a class="navbar-brand" href="#"><img src="{% static 'brand/recboard.png' %} " height="25px" width="25px" > <span class="text-muted"> | </span> recboard</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-              <ul class="navbar-nav ml-auto">
-                <!-- <li class="nav-item active">
-                  <a class="nav-link" href="#">Home
-                    <span class="sr-only">(current)</span>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">About</a>
-                </li> -->
-                <li class="nav-item">
-                  <a class="nav-link" href="https://github.com/mohit-chawla/recboard">Github</a>
-                </li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                  <a class="nav-link active" href="#"><i class="fa fa-user-circle"></i> {{ user.username }}</a>
-                </li> 
-                
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'logout' %}"> Log out</a>
-                </li>
-                {% endif %}
-              </ul>
-            </div>
-          </div>
-        </nav>
+        
         <div class="container-fluid">
             <!-- IMPORTANT enctype attribute! -->
             <div class="row top-buffer">
                 <div class="col-md-12">
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6">
+            <div class="row board-content-outer-div">
+                <div class="col-md-6 board-content-div">
                     <div id="datasets-div">
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 board-content-div">
                     <h4 >Upload new dataset</h4>
                     <hr>
                     <form class="dropzone" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
@@ -73,21 +74,21 @@
             </div>
            
 
-            <hr>
+            <!-- <hr> -->
             
             <!-- Workspaces start here -->
-            <span class="glyphicon glyphicon-search"></span>
-            <h2>Workspaces</h2>
-            <hr>
-            <div class="row">
-                <div id="create-workspace-div" class="col-md-12">
+            <div id="create-workspace-div" class="row board-content-outer-div">
+                <div class="col-md-12 board-content-div">
+                    <span class="glyphicon glyphicon-search"></span>
+                    <h2>Workspaces</h2>
+                    <hr>
                     <h4>Create new workspace</h4>
                     <input type="text" name="workspace-name" id="new-workspace-name"/>
                     <button id="create-workspace-btn" class="btn btn-secondary">Create Workspace <i class="fa fa-plus"></i></button>
                 </div>
             </div>
 
-            <div id="workspaces-div" class="row">
+            <div id="workspaces-div" class="row board-content-outer-div">
             </div> 
             <!-- Workspaces end here -->
             <script type="text/javascript">
@@ -98,6 +99,7 @@
                 debug = true
                 var userDatasets = [];
                 var availableRecommdenders = [];
+                var iframeTimeout = 10000
 
                 function getWorkspaceList(){
                     url = workspace_root_url + "/list"
@@ -161,7 +163,7 @@
                     //Creates form to create a model in workspace
                     options = modelDatasetOptionsUI()
 
-                    return ' Create new Model <div class="createModel"> Recommender <select class="recommenderSelect"> '+modelRecommenderOptionsUI()+'</select> Dataset <select class="datasetSelect">'+modelDatasetOptionsUI()+'</select> <button class="trainModel btn btn-primary">Train <i class="fa fa-superpowers"></i></button> </div>'
+                    return '<div class="createModel col-md-12"> Recommender <select class="recommenderSelect"> '+modelRecommenderOptionsUI()+'</select> Train Dataset <select id="train-datasetSelect" class="datasetSelect">'+modelDatasetOptionsUI()+'</select> Test Dataset <select id="test-datasetSelect" class="datasetSelect">'+modelDatasetOptionsUI()+'</select> <button class="trainModel btn btn-primary">Train <i class="fa fa-superpowers"></i></button> </div>'
                 }
 
                 function addWorkspacesToUI(workspaces){
@@ -173,10 +175,14 @@
                 
                 function addWorkspaceToUI(workspace){
                     //add single workspace to UI
-                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace"><h3>'+workspace+'</h3> <hr class="workspace-hr"/><br/>'+createModelForm()+' <span style="float:right"> <i class="fa fa-trash" style="color:#800000"></i></span></div>')
+                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h5>'+workspace+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" style="color:#ffcd00" data-toggle="tooltip" data-placement="top" title="Maximize/Minimize"></i></span> <i class="fa fa-trash" style="color:#800000"></i> </div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span></span></div>')
                 }
 
-
+                function datasetUIOptions(){
+                    renameOption = '<i class="fa fa-pencil datasetElOptions" style="color:#7ec0ee"></i>'
+                    deleteOption = '<i class="fa fa-trash datasetElOptions" style="color:#7ec0ee"></i>'
+                    return renameOption + deleteOption
+                }
                 function addDatasetsToUI(datasets){
                     $("#datasets-div").empty()
                     $("#datasets-div").append('<h4>Uploaded datasets</h4><hr>')
@@ -186,7 +192,7 @@
                     }
                     else{
                         $.each(datasets, function(_, dataset){
-                            $("#datasets-div").append('<div> <i class="fa fa-file" style="color:#7ec0ee"></i> '+dataset+'</div>')       
+                            $("#datasets-div").append('<div> <i class="fa fa-file" style="color:#7ec0ee"></i> '+dataset+datasetUIOptions()+'</div>')       
                         });
                     }
                 }
@@ -199,6 +205,10 @@
                         return data["port"]
                     });
                 }
+                function getLoadingDiv(){
+                    return '<div class="model-loading-div" height="800px" width="100%"><center> Loading training details.. <br/> <img src="{% static "img/loading.gif" %}"></center></div>'
+                }
+
                 // Train a model
                 $(document).on('click', '.trainModel', function (e) {
                     if (debug){
@@ -209,22 +219,25 @@
                     }
                     
                     selectedRecommender = $(this).siblings('.recommenderSelect').find(":selected").text()
-                    selectedDataset = $(this).siblings('.datasetSelect').find(':selected').text()
+                    selectedTrainDataset = $(this).siblings('#train-datasetSelect').find(':selected').text()
+                    selectedTestDataset = $(this).siblings('#test-datasetSelect').find(':selected').text()
                     $.ajax({
                         url : workspace_root_url+"/model/train",
                         type: "POST",
                         data : JSON.stringify({
                                 csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-                                train_dataset: selectedDataset,
+                                train_dataset: selectedTrainDataset,
                                 recommender: selectedRecommender,
                             }),
                         dataType : "json",
                         success: function( data ){
                             console.log("training requested ...",data)
                             port = data['msg']
+                            workspaces_div.append(getLoadingDiv())
                             setTimeout(function(){
-                                workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'"height="800px" width="100%"></iframe></div>') 
-                            },10000);
+                                workspaces_div.children().last().remove(); //remove loading element
+                                workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'"height="800px" width="100%"></iframe><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span><span class="modelOptions"><i class="fa fa-download"></i> Download</span><span class="modelOptions"> <i class="fa fa-upload"></i> Deploy</span></div>') 
+                            },iframeTimeout);
                             
                         }
                     });
@@ -256,6 +269,22 @@
                         });
                     }
                 });
+
+                $(document).on('click','.toggleWorkspace',function(e) {
+                  //handler code here
+                  if($(this).html() == '<i class="fa fa-window-maximize" style="color:#ffcd00"></i>'){
+                          $(this).html('<i class="fa fa-window-minimize" style="color:#ffcd00"></i>');
+                      }
+                      else{
+                          $(this).html('<i class="fa fa-window-maximize" style="color:#ffcd00"></i>');
+                      }
+                  $(this).parent().parent().siblings('.workspace-body').slideToggle()
+                });
+
+                $(function () {
+                  $('[data-toggle="tooltip"]').tooltip()
+                });
+                
 
                 // var 
                 $(window).load(function(){
