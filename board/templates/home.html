@@ -99,6 +99,7 @@
                 debug = true
                 var userDatasets = [];
                 var availableRecommdenders = [];
+                var iframeTimeout = 10000
 
                 function getWorkspaceList(){
                     url = workspace_root_url + "/list"
@@ -174,7 +175,7 @@
                 
                 function addWorkspaceToUI(workspace){
                     //add single workspace to UI
-                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h3>'+workspace+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" style="color:#ffcd00"></i></span> <i class="fa fa-trash" style="color:#800000"></i> </div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span></span></div>')
+                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h5>'+workspace+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" style="color:#ffcd00" data-toggle="tooltip" data-placement="top" title="Maximize/Minimize"></i></span> <i class="fa fa-trash" style="color:#800000"></i> </div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span></span></div>')
                 }
 
                 function datasetUIOptions(){
@@ -204,6 +205,10 @@
                         return data["port"]
                     });
                 }
+                function getLoadingDiv(){
+                    return '<div class="model-loading-div" height="800px" width="100%"><center> Loading training details.. <br/> <img src="{% static "img/loading.gif" %}"></center></div>'
+                }
+
                 // Train a model
                 $(document).on('click', '.trainModel', function (e) {
                     if (debug){
@@ -221,16 +226,18 @@
                         type: "POST",
                         data : JSON.stringify({
                                 csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-                                train_dataset: selectedDataset,
+                                train_dataset: selectedTrainDataset,
                                 recommender: selectedRecommender,
                             }),
                         dataType : "json",
                         success: function( data ){
                             console.log("training requested ...",data)
                             port = data['msg']
+                            workspaces_div.append(getLoadingDiv())
                             setTimeout(function(){
-                                workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'"height="800px" width="100%"></iframe></div>') 
-                            },10000);
+                                workspaces_div.children().last().remove(); //remove loading element
+                                workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'"height="800px" width="100%"></iframe><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span><span class="modelOptions"><i class="fa fa-download"></i> Download</span><span class="modelOptions"> <i class="fa fa-upload"></i> Deploy</span></div>') 
+                            },iframeTimeout);
                             
                         }
                     });
@@ -262,6 +269,22 @@
                         });
                     }
                 });
+
+                $(document).on('click','.toggleWorkspace',function(e) {
+                  //handler code here
+                  if($(this).html() == '<i class="fa fa-window-maximize" style="color:#ffcd00"></i>'){
+                          $(this).html('<i class="fa fa-window-minimize" style="color:#ffcd00"></i>');
+                      }
+                      else{
+                          $(this).html('<i class="fa fa-window-maximize" style="color:#ffcd00"></i>');
+                      }
+                  $(this).parent().parent().siblings('.workspace-body').slideToggle()
+                });
+
+                $(function () {
+                  $('[data-toggle="tooltip"]').tooltip()
+                });
+                
 
                 // var 
                 $(window).load(function(){
@@ -322,20 +345,6 @@
                     }
 
                 };
-                // $(".minimize").on('click',function(e){
-                //     alert('hi')
-                //     $(this).parent().slideToggle()
-                // });
-                $(document).on('click','.toggleWorkspace',function(e) {
-                  //handler code here
-                  if($(this).html() == '<i class="fa fa-window-maximize" style="color:#ffcd00"></i>'){
-                          $(this).html('<i class="fa fa-window-minimize" style="color:#ffcd00"></i>');
-                      }
-                      else{
-                          $(this).html('<i class="fa fa-window-maximize" style="color:#ffcd00"></i>');
-                      }
-                  $(this).parent().parent().siblings('.workspace-body').slideToggle()
-                });
             </script>
         </div>
     </body>
