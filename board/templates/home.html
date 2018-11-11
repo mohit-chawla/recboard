@@ -107,7 +107,25 @@
                         console.log("listing workspaces",url)   
                     }
                     $.get( url, function( workspaces ) {
+                        console.log(workspaces)
                         addWorkspacesToUI(workspaces)
+                    });
+                }
+
+                function getWorkspaceModelsList(wid,cb){
+                    url =workspace_root_url + "/model/list"+"?wid="+wid
+                    
+                    if (debug){
+                        console.log("listing workspace models",url) 
+                    }
+
+                    $.get(url, function( data ){
+                            console.log("data:",data)
+                            data = eval(data)
+                            console.log("Listed workspace models:",data)
+                            if(cb && typeof cb === "function") {
+                                return cb(data);
+                            }
                     });
                 }
 
@@ -146,7 +164,7 @@
                 function modelDatasetOptionsUI(){
                     options = ""
                     $.each(userDatasets, function(i,ds){
-                        options += "<option>"+ds+"</option>"
+                        options += '<option did="'+ds[0]+'">'+ds[1]+'</option>'
                     });
                     return options
                 }
@@ -168,19 +186,64 @@
 
                 function addWorkspacesToUI(workspaces){
                     //clear existing workspaces
-                    $.each(workspaces,function(_,workspace){
-                        addWorkspaceToUI(workspace)
-                    });
+                    var workspaces = eval(workspaces);
+                    for(var workspace_id in workspaces){
+                        if (workspaces.hasOwnProperty(workspace_id)){
+                            var workspace_details=workspaces[workspace_id]; //[name]
+                            addWorkspaceToUI(workspace_id, workspace_details[0])
+                        }
+                    }
+                    // $.each(workspaces,function(_,workspace){
+                    //     addWorkspaceToUI(workspace)
+                    // });
+                }
+                function getModelsDiv(models){
+                    models_div= ""
+                    var models = eval(models);
+                    console.log("models:",models)
+                    for(var model_id in models){
+                        if (models.hasOwnProperty(model_id)){
+                            var model_details=models[model_id]; //[status,port,file_location]
+                            model_status = model_details[0]
+                            model_port = model_details[1]
+                            model_file_location = model_details[2]
+                            if (model_status == "TRAINED"){
+                                // show download and deploy options
+                                models_div += ('<div mid="'+model_id+'" class="model-div">Model:'+model_id+'<a href="'+model_file_location+'"><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
+                            }else{
+                                //show iframe
+                                models_div += ('<div mid ="'+model_id+'" class="model-div">Model:'+model_id+'<br/><iframe src="http://localhost:'+model_port+'"height="800px" width="100%"></iframe><span class="modelStatus">'+model_status+'</span><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span></div>')
+                            }
+
+                        }
+                    }
+                    console.log("here",models_div)
+                    return models_div
                 }
                 
-                function addWorkspaceToUI(workspace){
+                function addWorkspaceToUI(workspace_id, workspace_name){
+                    url =workspace_root_url + "/model/list"+"?wid="+workspace_id
+                    
+                    if (debug){
+                        console.log("listing workspace models",url) 
+                    }
+
+                    $.get(url, function( data ){
+                        console.log("data:",data)
+                        data = eval(data)
+                        console.log("Listed workspace models:",data)
+                        models_div = getModelsDiv(data)
+
+                        // models_div = getWorkspaceModelsList(workspace_id,getModelsDiv)                        
+                        console.log("models_div",models_div)
                     //add single workspace to UI
-                        $("#workspaces-div").prepend('<div id='+workspace+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h5>'+workspace+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" style="color:#ffcd00" data-toggle="tooltip" data-placement="top" title="Maximize/Minimize"></i></span> <i class="fa fa-trash" style="color:#800000"></i> </div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span></span></div>')
+                        $("#workspaces-div").prepend('<div wid='+workspace_id+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h5>'+workspace_name+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" data-toggle="tooltip" data-placement="top" title="Maximize/Minimize"></i></span> <i class="fa fa-trash deleteWorkspace"></i> </div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span>'+models_div+'</span></div>')     
+                    });
                 }
 
                 function datasetUIOptions(){
-                    renameOption = '<i class="fa fa-pencil datasetElOptions" style="color:#7ec0ee"></i>'
-                    deleteOption = '<i class="fa fa-trash datasetElOptions" style="color:#7ec0ee"></i>'
+                    renameOption = '<i class="fa fa-pencil datasetElOptions"></i>'
+                    deleteOption = '<i class="fa fa-trash datasetElOptions"></i>'
                     return renameOption + deleteOption
                 }
                 function addDatasetsToUI(datasets){
@@ -192,7 +255,7 @@
                     }
                     else{
                         $.each(datasets, function(_, dataset){
-                            $("#datasets-div").append('<div> <i class="fa fa-file" style="color:#7ec0ee"></i> '+dataset+datasetUIOptions()+'</div>')       
+                            $("#datasets-div").append('<div did="'+dataset[0]+'"> <i class="fa fa-file" style="color:#7ec0ee"></i> '+dataset[1]+datasetUIOptions()+'</div>')       
                         });
                     }
                 }
@@ -219,24 +282,31 @@
                     }
                     
                     selectedRecommender = $(this).siblings('.recommenderSelect').find(":selected").text()
-                    selectedTrainDataset = $(this).siblings('#train-datasetSelect').find(':selected').text()
-                    selectedTestDataset = $(this).siblings('#test-datasetSelect').find(':selected').text()
+                    selectedTrainDatasetId = $(this).siblings('#train-datasetSelect').find(':selected').attr('did')
+                    selectedTestDatasetId = $(this).siblings('#test-datasetSelect').find(':selected').attr('did')
+                    parentWorkspaceDiv = $(this).parent().parent().parent()
+                    parentWorkspaceId = $(this).parent().parent().parent().attr('wid')
+                    console.log("creating model for workspace",parentWorkspaceId)
+                    
                     $.ajax({
                         url : workspace_root_url+"/model/train",
                         type: "POST",
                         data : JSON.stringify({
                                 csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-                                train_dataset: selectedTrainDataset,
+                                train_dataset: selectedTrainDatasetId,
+                                test_dataset: selectedTestDatasetId,
                                 recommender: selectedRecommender,
+                                workspace_id: parentWorkspaceId,
                             }),
                         dataType : "json",
                         success: function( data ){
                             console.log("training requested ...",data)
                             port = data['msg']
+                            model_id = data['mid'] //id of newly created model
                             workspaces_div.append(getLoadingDiv())
                             setTimeout(function(){
                                 workspaces_div.children().last().remove(); //remove loading element
-                                workspaces_div.append('<div class="model-div"><iframe src="http://localhost:'+port+'"height="800px" width="100%"></iframe><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span><span class="modelOptions"><i class="fa fa-download"></i> Download</span><span class="modelOptions"> <i class="fa fa-upload"></i> Deploy</span></div>') 
+                                workspaces_div.append('<div mid ="'+model_id+'"class="model-div">Model:'+model_id+'<br/><iframe src="http://localhost:'+port+'"height="800px" width="100%"></iframe><span class="modelStatus">CREATED</span><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span><span class="modelOptions"><i class="fa fa-download"></i> Download</span><span class="modelOptions"> <i class="fa fa-upload"></i> Deploy</span></div>') 
                             },iframeTimeout);
                             
                         }
@@ -261,9 +331,11 @@
                             type: "POST",
                             data : JSON.stringify({workspace_name:new_workspace_name}),
                             dataType : "json",
-                            success: function( newWorkspaceList ){
-                                console.log("workspace created ..., updating UI")
-                                addWorkspaceToUI(new_workspace_name)
+                            success: function( new_workspace_details ){
+                                wid = new_workspace_details[0]
+                                name = new_workspace_details[1]
+                                console.log("workspace created ..., updating UI", new_workspace_details)
+                                addWorkspaceToUI(wid, name)
                                 $("#new-workspace-name").val("")
                             }
                         });
@@ -272,11 +344,11 @@
 
                 $(document).on('click','.toggleWorkspace',function(e) {
                   //handler code here
-                  if($(this).html() == '<i class="fa fa-window-maximize" style="color:#ffcd00"></i>'){
-                          $(this).html('<i class="fa fa-window-minimize" style="color:#ffcd00"></i>');
+                  if($(this).html() == '<i class="fa fa-window-maximize"></i>'){
+                          $(this).html('<i class="fa fa-window-minimize"></i>');
                       }
                       else{
-                          $(this).html('<i class="fa fa-window-maximize" style="color:#ffcd00"></i>');
+                          $(this).html('<i class="fa fa-window-maximize"></i>');
                       }
                   $(this).parent().parent().siblings('.workspace-body').slideToggle()
                 });
@@ -285,12 +357,27 @@
                   $('[data-toggle="tooltip"]').tooltip()
                 });
                 
+                $(document).on('click','.deleteWorkspace',function(e) {
+                    wid = $(this).parent().parent().parent().attr('wid')
+                    $.ajax({
+                        url : workspace_root_url+"/delete",
+                        type: "DELETE",
+                        data : JSON.stringify({wid:wid}),
+                        dataType : "json",
+                        success: function(data){
+                            alert("Deleting the workspace..")
+                            console.log($(this).parent().parent().parent())
+                            $( "div[wid='"+wid+"']").remove()
+                        }
+                    });
+                });
 
                 // var 
                 $(window).load(function(){
                     // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
                     getAvailableRecommenders(getDatasetList(getWorkspaceList));                    
                 });
+
 
 
             </script>

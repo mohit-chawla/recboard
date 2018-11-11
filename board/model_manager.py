@@ -11,10 +11,12 @@ from openrec.recommenders import BPR
 from openrec.utils.evaluators import AUC
 from openrec import ModelTrainer
 
+from .constants import *
+
 FORMAT = '%(asctime)-15s %(message)s'
 
 class ModelManager:
-    def __init__(self, recommender_name, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
+    def __init__(self,model_id, db, recommender_name, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
         self.recommender_name = recommender_name
         self.train_sampler = train_sampler
         self.val_sampler = val_sampler
@@ -25,7 +27,9 @@ class ModelManager:
         logging.basicConfig(format=FORMAT)
         self.logger = logging.getLogger(__name__)
 
-        self.model_id = '100xxks'
+        self.model_id = model_id
+        self.db = db
+
         self.logger.info("ModelManager init generated model id=", self.model_id)
 
         
@@ -133,11 +137,25 @@ class ModelManager:
 
         print("############ starting training.. ############")
 
-        model_trainer.train(total_iter=10000,  # Total number of training iterations
-                            eval_iter=1000,    # Evaluate the model every "eval_iter" iterations
-                            save_iter=10000,   # Save the model every "save_iter" iterations
+        print("Fetching model for id:",self.model_id)
+        model_db = self.db.get('model',id=self.model_id)
+        print("model_found:",model_db.id)
+
+        model_db.status = MODEL_STATUS_TRAINING
+        self.db.insert('model',model_db)
+
+        model_trainer.train(total_iter=10,  # Total number of training iterations
+                            eval_iter=10,    # Evaluate the model every "eval_iter" iterations
+                            save_iter=10,   # Save the model every "save_iter" iterations
                             train_sampler=train_sampler, 
                             eval_samplers=[val_sampler, test_sampler], 
                             evaluators=[auc_evaluator])
         # self.logger.info("THIS IS WHEN MODEL WILL START TRAINING... returning")
         self.logger.info("-------- sample_data_and_train ends --------")
+
+        model_db = self.db.get('model',id=self.model_id)
+        print("model_found:",model_db.id)
+
+        model_db.status = MODEL_STATUS_TRAINED
+        model_db.file_location = "/mohit"
+        self.db.insert('model',model_db)

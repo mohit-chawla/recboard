@@ -66,3 +66,12 @@
 .danger:hover{
 	color:red !important;
 }
+
+.deleteWorkspace,.toggleWorkspace,.deleteModel,.datasetElOptions{
+	color:#999;
+}
+
+.deleteWorkspace:hover,.toggleWorkspace:hover,.deleteModel:hover,.datasetElOptions:hover{
+	color:#222;
+	cursor:pointer;
+}
