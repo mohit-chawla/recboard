@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^home/$', views.HomePage.as_view(), name='home'),
     path('user/workspace/recommender/list',views.list_recommenders,name='recommenders'),
     path('user/workspace/delete',views.delete_workspace,name='delete workspace'),
+    path('user/workspace/model/delete',views.delete_model,name='delete model'),
     path('user/workspace/model/train', views.create, name='index'),
     path('user/workspace/model/port', views.get_model_port, name='index'),
     path('user/workspace/model/list', views.list_models, name='list workspace models'),

@@ -203,12 +203,12 @@ def get_model_default_name(user):
 def delete_model(request):
     body = get_request_body(request)
 
-    if not  body or not 'mid' in body:
+    if not body or not 'mid' in body:
         return HttpResponseBadRequest("Bad request")
 
     mid = body['mid']
     db.delete('model',id=ObjectId(mid)) 
-    return HttpResponse(status=200)       
+    return JsonResponse("Deleted",safe=False)
 
 @login_required(login_url=BOARD_HOME)
 def delete_workspace(request):

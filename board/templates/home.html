@@ -209,10 +209,10 @@
                             model_file_location = model_details[2]
                             if (model_status == "TRAINED"){
                                 // show download and deploy options
-                                models_div += ('<div mid="'+model_id+'" class="model-div">Model:'+model_id+'<a href="'+model_file_location+'"><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
+                                models_div += ('<div mid="'+model_id+'" class="model-div" mstatus="'+model_status+'">Model:'+model_id+'<a href="'+model_file_location+'"><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
                             }else{
                                 //show iframe
-                                models_div += ('<div mid ="'+model_id+'" class="model-div">Model:'+model_id+'<br/><iframe src="http://localhost:'+model_port+'"height="800px" width="100%"></iframe><span class="modelStatus">'+model_status+'</span><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span></div>')
+                                models_div += ('<div mid ="'+model_id+'" class="model-div" mstatus="'+model_status+'">Model:'+model_id+'<br/><iframe src="http://localhost:'+model_port+'"height="800px" width="100%"></iframe><span class="modelStatus">'+model_status+'</span><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span></div>')
                             }
 
                         }
@@ -372,6 +372,21 @@
                     });
                 });
 
+                $(document).on('click','.deleteModel',function(e) {
+                    mid = $(this).parent().attr('mid')
+                    console.log("trying to del,",mid)
+                    $.ajax({
+                        url : workspace_root_url+"/model/delete",
+                        type: "DELETE",
+                        data : JSON.stringify({mid:mid}),
+                        dataType : "json",
+                        success: function(data){
+                            alert("Deleting the model..")
+                            $( "div[mid='"+mid+"']").remove()
+                        }
+                    });
+                });
+
 
                 // var 
                 $(window).load(function(){
@@ -381,12 +396,13 @@
                         model_divs = $("div[mid]")
                         $.each(model_divs, function(_ , md){
                             mid = $(md).attr('mid')
+                            statusUI = $(md).attr('mstatus')
                             if (debug){
                                 console.log("checking status for ",mid)    
                             }
                             url = workspace_root_url + "/model/status"+"?mid="+mid
                             $.get( url, function( model_status ) {
-                                if (model_status == "TRAINED"){ //bug
+                                if (model_status == "TRAINED" & statusUI != 'TRAINED'){ //bug
                                     $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
                                 }
                             });    
