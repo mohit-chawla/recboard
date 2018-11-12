@@ -237,7 +237,7 @@
                         // models_div = getWorkspaceModelsList(workspace_id,getModelsDiv)                        
                         console.log("models_div",models_div)
                     //add single workspace to UI
-                        $("#workspaces-div").prepend('<div wid='+workspace_id+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h5>'+workspace_name+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" data-toggle="tooltip" data-placement="top" title="Maximize/Minimize"></i></span> <i class="fa fa-trash deleteWorkspace"></i> <i class="fa fa-gear workspaceSettings"></i></div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span>'+models_div+'</span></div>')     
+                        $("#workspaces-div").prepend('<div wid='+workspace_id+' class="workspace col-md-12"><div class="row workspaceNav"><div class="col-md-11"><span class="workspaceName">'+workspace_name+'</span></div><div class="col-md-1"><i class="fa fa-window-minimize toggleWorkspace workspaceAction"></i><i class="fa fa-trash deleteWorkspace workspaceAction"></i> <i class="fa fa-gear workspaceSettings workspaceAction"></i></div></div><span class="workspaceBody"> <div class="col-md-12"> <span class="thick">Add model to workspace </span></div>'+createModelForm()+' <span style="float:right"></span>'+models_div+'</span></div>')     
                     });
                 }
 
@@ -343,14 +343,13 @@
                 });
 
                 $(document).on('click','.toggleWorkspace',function(e) {
-                  //handler code here
-                  if($(this).html() == '<i class="fa fa-window-maximize"></i>'){
-                          $(this).html('<i class="fa fa-window-minimize"></i>');
-                      }
-                      else{
-                          $(this).html('<i class="fa fa-window-maximize"></i>');
-                      }
-                  $(this).parent().parent().siblings('.workspace-body').slideToggle()
+                  if ($(this).hasClass('fa-window-minimize')){
+                    $(this).removeClass('fa-window-minimize').addClass('fa-window-maximize')
+                  }
+                  else{
+                    $(this).removeClass('fa-window-maximize').addClass('fa-window-minimize')
+                  }
+                  $(this).parent().parent().siblings('.workspaceBody').slideToggle()
                 });
 
                 $(function () {
