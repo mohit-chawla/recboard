@@ -130,13 +130,13 @@ def get_model_status(request):
         Get status of a model
         returns one of constants MODEL_STATUS_*
     """
-    body = get_request_body(request)
-    if not 'mid' in body:
-        HttpResponseBadRequest("Missing mid")
-    mid = body['mid']
+    mid = request.GET.get('mid','')
+    print("checking model status for",mid)
+    if not mid:
+        return JsonResponse("",safe=False)
 
     model = db.get('model',id=ObjectId(mid))
-    return JsonResponse(model.status,safe="False")
+    return JsonResponse(model.status,safe=False)
 
 @login_required(login_url=BOARD_HOME)
 def list_recommenders(request):

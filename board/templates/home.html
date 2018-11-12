@@ -237,7 +237,7 @@
                         // models_div = getWorkspaceModelsList(workspace_id,getModelsDiv)                        
                         console.log("models_div",models_div)
                     //add single workspace to UI
-                        $("#workspaces-div").prepend('<div wid='+workspace_id+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h5>'+workspace_name+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" data-toggle="tooltip" data-placement="top" title="Maximize/Minimize"></i></span> <i class="fa fa-trash deleteWorkspace"></i> </div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span>'+models_div+'</span></div>')     
+                        $("#workspaces-div").prepend('<div wid='+workspace_id+' class="workspace col-md-12"><div class="row"><div class="col-md-11"><h5>'+workspace_name+'</h3></div><div class="col-md-1"><span class="toggleWorkspace"><i class="fa fa-window-minimize" data-toggle="tooltip" data-placement="top" title="Maximize/Minimize"></i></span> <i class="fa fa-trash deleteWorkspace"></i> <i class="fa fa-gear workspaceSettings"></i></div></div><hr class="workspace-hr col-md-12"/><br/> <span class="workspace-body"> <div class="col-md-12"> <button class="btn btn-success">Add model <i class="fa fa-plus"> </i></button></div>'+createModelForm()+' <span style="float:right"></span>'+models_div+'</span></div>')     
                     });
                 }
 
@@ -372,10 +372,26 @@
                     });
                 });
 
+
                 // var 
                 $(window).load(function(){
                     // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
-                    getAvailableRecommenders(getDatasetList(getWorkspaceList));                    
+                    getAvailableRecommenders(getDatasetList(getWorkspaceList));
+                    var modelStatusCheck = setInterval(function(){
+                        model_divs = $("div[mid]")
+                        $.each(model_divs, function(_ , md){
+                            mid = $(md).attr('mid')
+                            if (debug){
+                                console.log("checking status for ",mid)    
+                            }
+                            url = workspace_root_url + "/model/status"+"?mid="+mid
+                            $.get( url, function( model_status ) {
+                                if (model_status == "TRAINED"){ //bug
+                                    $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
+                                }
+                            });    
+                        });
+                    }, 10000);
                 });
 
 

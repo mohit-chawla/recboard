@@ -67,11 +67,11 @@
 	color:red !important;
 }
 
-.deleteWorkspace,.toggleWorkspace,.deleteModel,.datasetElOptions{
+.deleteWorkspace,.toggleWorkspace,.deleteModel,.datasetElOptions,.workspaceSettings{
 	color:#999;
 }
 
-.deleteWorkspace:hover,.toggleWorkspace:hover,.deleteModel:hover,.datasetElOptions:hover{
+.deleteWorkspace:hover,.toggleWorkspace:hover,.deleteModel:hover,.datasetElOptions:hover,.workspaceSettings:hover{
 	color:#222;
 	cursor:pointer;
 }

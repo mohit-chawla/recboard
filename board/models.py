@@ -14,7 +14,7 @@ class Dataset(Document):
 	tags = ListField(StringField(max_length=120, required=True))
 	meta = {'collection': 'dataset'}
 	owner  = ObjectIdField()
-	path = StringField(max_length=120, required=True)
+	path = StringField(max_length=120, required=False)
 	#TODO: switch from auto indexing to manual later
 
 class Model(Document):
