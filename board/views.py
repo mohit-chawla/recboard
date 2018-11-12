@@ -26,6 +26,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from openrec import recommenders
+from time import time
+from bson import ObjectId
 
 logging.getLogger(__name__)
 
@@ -69,8 +71,10 @@ def save_uploaded_file(user,filename,file):
         #use chunks instead of read to avoid having large files in memory
         for chunk in file.chunks():
             destination.write(chunk)
-            
-        user.datasets.append(Dataset(name=filename,tags=["tags"]))#add this dataset to user
+        
+        new_dataset=  Dataset(name=filename,tags=["tags"])
+        db.insert('dataset',new_dataset)
+        user.datasets.append(new_dataset.id)#add this dataset to user
         db.insert('user',user)  #update user doc
         logging.info("Uploaded file saved","file:",filename,"location:",destination)
 
@@ -87,19 +91,54 @@ def upload(request):
     return HttpResponse("Uploaded")
 
 @login_required(login_url=BOARD_HOME)
+def list_models(request):
+    """Returns list of datasets"""
+    print(request)
+    wid = request.GET.get('wid','')
+
+    models = db.select('model',workspace_id=ObjectId(wid))
+    print("LISTING MODELS FOR WID:",wid)
+    print("models:",models)
+    models_dict = {}
+    for model in models:
+        models_dict[str(model.id)] = [model.status,model.port,model.file_location]
+    print("models_dict:",models_dict)
+    return JsonResponse(models_dict,safe=False)
+
+@login_required(login_url=BOARD_HOME)
 def list_datasets(request):
     """Returns list of datasets"""
     user = get_dummy_user()
     u = db.get('user',name=user.name)
-    return JsonResponse([ds.name for ds in u.datasets],safe=False)
+    user_datasets = [db.get('dataset',id=did) for did in u.datasets]
+    return JsonResponse([[str(ds.id),ds.name] for ds in user_datasets],safe=False)
 
+@login_required(login_url=BOARD_HOME)
 def list_workspaces(request):
     """Returns list of datasets"""
     user = get_dummy_user()
     u = db.get('user',name=user.name) #TODO: replace with actual user
-    return JsonResponse([workspace.name for workspace in u.workspaces],safe=False)
+    # return JsonResponse([workspace.name for workspace in db.select('workspace',user_id=u.id)],safe=False)
+    workspaces = {}
+    for workspace_doc in db.select('workspace',user_id=u.id):
+        workspaces[str(workspace_doc.id)] = [workspace_doc.name] #should be dict but json parsing in js in tideous
+    return JsonResponse(workspaces)
 
+@login_required(login_url=BOARD_HOME)
+def get_model_status(request):
+    """
+        Get status of a model
+        returns one of constants MODEL_STATUS_*
+    """
+    mid = request.GET.get('mid','')
+    print("checking model status for",mid)
+    if not mid:
+        return JsonResponse("",safe=False)
 
+    model = db.get('model',id=ObjectId(mid))
+    return JsonResponse(model.status,safe=False)
+
+@login_required(login_url=BOARD_HOME)
 def list_recommenders(request):
     """List available recommenders with openrec"""
     _recs = []
@@ -107,6 +146,7 @@ def list_recommenders(request):
         if callable(getattr(recommenders, func)) and func.lower()!="recommender":
             _recs.append(func)
     return JsonResponse(_recs,safe=False)
+
 
 def get_dummy_user():
     if len(db.select('user')) == 0:
@@ -127,6 +167,9 @@ def get_request_body(request):
 
 def create_workspace(request):
     """Creates a new workspace for userid"""
+    """
+        @Returns: new workspace id , name(custom or default)
+    """
     body = get_request_body(request)
     if not body or not "workspace_name" in body:
         HttpResponseBadRequest("Bad request")
@@ -134,9 +177,11 @@ def create_workspace(request):
     dummy = get_dummy_user()
     user = db.get('user',name=dummy.name) #TODO: replace with actual user
     #TODO: replace with actual update op using addset for better perf
-    user.workspaces.append(Workspace(name=body['workspace_name']))
+    new_workspace = Workspace(name=body['workspace_name'],user_id=user.id)
+    db.insert('workspace', new_workspace)
+    user.workspaces.append(new_workspace.id)
     db.insert('user',user)
-    return JsonResponse([workspace.name for workspace in user.workspaces],safe=False)
+    return JsonResponse([str(new_workspace.id), body['workspace_name']],safe=False)
 
 def get_model_port(request):
     dummy = get_dummy_user()
@@ -146,29 +191,84 @@ def get_model_port(request):
         return HttpResponseBadRequest("No workspace or model")
     return JsonResponse({"port":user.workspaces.models[-1].port})
 
+def get_model_default_name(user):
+    """creates default name for a model"""
+    name = ""
+    if user:
+        name += (user.name + "_")
+    name += str(time())
+    return name
+
+@login_required(login_url=BOARD_HOME)
+def delete_model(request):
+    body = get_request_body(request)
+
+    if not body or not 'mid' in body:
+        return HttpResponseBadRequest("Bad request")
+
+    mid = body['mid']
+    db.delete('model',id=ObjectId(mid)) 
+    return JsonResponse("Deleted",safe=False)
+
+@login_required(login_url=BOARD_HOME)
+def delete_workspace(request):
+    """Deletes a workspace and related models"""
+    #find all models in that workspace and delete them
+    #delete the workspace
+    body = get_request_body(request)
+
+    if not  body or not 'wid' in body:
+        return HttpResponseBadRequest("Bad request")
+    wid = body['wid']
+    models = db.select('model',workspace_id=ObjectId(wid))
+    for model in models:
+        db.delete('model',id=model.id)
+    db.delete('workspace',id=ObjectId(wid))
+    return JsonResponse("Deleted",safe=False)
+
 class HomePage(TemplateView):
     """
         This is a class based view for home page (/home)
     """
     template_name = 'home.html'
 
-
 def create(request):
     body = get_request_body(request)
 
-    if not 'recommender' in body or not 'train_dataset' in body:
+    if not 'recommender' in body or not 'train_dataset' in body or not 'test_dataset' in body or not "workspace_id" in body:
         return HttpResponseBadRequest("Bad request")
 
     recommender = body['recommender']
+    workspace_id = ObjectId(body['workspace_id'])
+    train_dataset = db.get('dataset',id=ObjectId(body['train_dataset']))
+    test_dataset = db.get('dataset',id=ObjectId(body['test_dataset']))
 
     print ('Parent process pid:', os.getpid())
     user = get_dummy_user()
     body = get_request_body(request)
     
+    if 'name' in body:
+        model_name = name #user provided custom name
+    else:
+        model_name = get_model_default_name(user) #user did not provide name, create a name
+
+
+    # TODO: maintain a list of available ports later
+    tensorboard_port = str(randint(6000,7000)) 
+    print("port generated", tensorboard_port,"Starting tb")
+
+    model = Model(name=model_name,status=MODEL_STATUS_CREATED, train_dataset= train_dataset.id,test_dataset=test_dataset.id,logdir=LOG_DIR, port=tensorboard_port,workspace_id=workspace_id)
+    db.insert('model', model) #insert new model
+    workspace = db.get('workspace',id=workspace_id)
+    workspace.models.append(model.id)
+    db.insert('workspace',workspace)
+    model_id = model.id #id of newly created model
+    print("created new model id:",model_id,"for workspace id:",workspace.id)
+
     # TODO: ensure user.id is not None
-    dataset_path = DATASET_PATH_PREFIX+str(user.id)+"_file_"+body['train_dataset']
+    dataset_path = DATASET_PATH_PREFIX+str(user.id)+"_file_"+train_dataset.name
     print("\n\n Fetching dataset from path = ", dataset_path ,"\n\n")
-    model_controller_obj = ModelManager(recommender, 'train_samp', 'val_samp', 'test_samp', 'AUC', dataset_path)
+    model_controller_obj = ModelManager(model_id, db, recommender, 'train_samp', 'val_samp', 'test_samp', 'AUC', dataset_path)
     
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()
@@ -185,10 +285,7 @@ def create(request):
         user.workspaces.append(Workspace(name="workspacename2"))
         db.insert('user',user)
     
-    # TODO: maintain a list of available ports later
-    tensorboard_port = str(randint(6000,7000)) 
-    print("port generated", tensorboard_port,"Starting tb")
-
+    
     # TODO: add try catch here (in case the tensorboard couldnt be started)
     
     cmd = "tensorboard --logdir "+LOG_DIR+" --host localhost --port "+tensorboard_port 
@@ -198,15 +295,12 @@ def create(request):
     
     print("TB started")
 
-    model = Model(name="myModel",status="just created", dataset=user.datasets[0],logdir=LOG_DIR, port=tensorboard_port)
-    user.workspaces[-1].models.append(model)
-    db.insert('user',user)
-
-    return JsonResponse({'msg':tensorboard_port})
+    return JsonResponse({'msg':tensorboard_port,'mid':str(model_id)})
     # except:
     #     print("Error in getting generated model-id")
     #     p.terminate() # Force terminate training
     #     return JsonResponse({'msg':"Error in getting generated model-id"})
+
 
 if __name__ == "__main__":
     list_datasets()

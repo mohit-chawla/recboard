@@ -13,7 +13,8 @@ class RecboardDB:
 		'index' : 'index',
 		'user' : 'User',
 		'dataset': 'Dataset',
-		'model' : 'Model'
+		'model' : 'Model',
+		'workspace' : 'Workspace'
 	}
 
 	def __init__(self):
@@ -113,4 +114,6 @@ if __name__ == "__main__":
 	# print(db.get('user',name='Mohit').name)
 	# #get count
 	# print(db.count('user',name='Mohit'))
-	db.insert('dataset',Dataset(name="mohit_dataset",tags=["tags"]))
+	# db.insert('dataset',Dataset(name="mohit_dataset",tags=["tags"]))
+	user = db.get('user',id="5be64272d7bea8481dd4a569")
+	print(user.id)
