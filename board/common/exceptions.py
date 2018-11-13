@@ -3,3 +3,7 @@ class ServerUnreachable(Exception):
 
 class InvalidCollectionName(Exception):
 	pass
+
+
+class InvalidArgumentException(Exception):
+	pass

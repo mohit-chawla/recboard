@@ -120,7 +120,7 @@ class ModelManager:
                         total_items=train_dataset.total_items(), 
                         dim_user_embed=50, 
                         dim_item_embed=50, 
-                        save_model_dir='bpr_recommender/', 
+                        save_model_dir='data/'+str(self.model_id)+'/', 
                         train=True, serve=True)
 
 

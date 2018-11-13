@@ -28,6 +28,8 @@ from django.contrib.auth.decorators import login_required
 from openrec import recommenders
 from time import time
 from bson import ObjectId
+import mimetypes
+from django.utils.encoding import smart_str
 
 logging.getLogger(__name__)
 
@@ -225,6 +227,38 @@ def delete_workspace(request):
         db.delete('model',id=model.id)
     db.delete('workspace',id=ObjectId(wid))
     return JsonResponse("Deleted",safe=False)
+
+
+def _serve(filename,file_path):
+    """Serves a file"""
+    if not filename or not file_path:
+        raise InvalidArgumentException
+
+    response = HttpResponse(content_type='application/force-download') 
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(filename)
+    response['X-Sendfile'] = smart_str(file_path)
+    
+    return response
+
+
+def download_model(request):
+    """Serves a model file with model-id:mid"""
+    mid = request.GET.get('mid','')
+    if not mid:
+        return JsonResponse("",safe=False)
+
+    print("requested mdoel file for",mid)   
+    
+    filename = "model.ckpt.index"
+    file_path = "data/"+mid+"/{0}".format(filename)
+
+    try:
+        response = _serve(filename, file_path)
+    except:
+        response = HttpResponseBadRequest("Model file not found")
+
+    return response
+
 
 class HomePage(TemplateView):
     """
