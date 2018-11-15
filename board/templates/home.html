@@ -978,8 +978,9 @@
 
 {% else %}
   <head>
+    <!-- Yes, we need this separate bootstrap css -->
     <link href="{{STATIC_URL}}/static/css/bootstrap.css" type="text/css" rel="stylesheet"/>
-    <link href="{{STATIC_URL}}/static/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
+    <link href="{{STATIC_URL}}/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="{{STATIC_URL}}/static/css/board.css" type="text/css" rel="stylesheet"/>
     <link href="{{STATIC_URL}}/static/css/floating-labels.css" type="text/css" rel="stylesheet"/>
   </head>
