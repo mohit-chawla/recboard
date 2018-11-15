@@ -563,6 +563,7 @@
                       <div class="x_content">\
                         <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
                             <button type="button" class="btn btn-primary">Download model</button>\
+                            <button type="button" class="btn btn-warning">Deploy model</button>\
                         </div>\
                     </div>\
                   </div>\
@@ -685,7 +686,7 @@
           });
       }
 
-      function getLoadingDiv(model_id){
+      function getLoadingDiv(model_id, wid){
         return '\
           <div class="col-md-12 col-sm-12 col-xs-12">\
             <div class="x_panel">\
@@ -713,7 +714,7 @@
               </div>\
               <div class="x_content">\
                 <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
-                  <center> Loading training details.. <br/> <img src="{% static "img/loading.gif" %}"></center>\
+                  <center> Loading training details.. <br/> <i class="fa fa-spinner fa-spin"></i></center>\
                 </div>\
             </div>\
           </div>\
@@ -750,7 +751,7 @@
                   console.log("training requested ...",data)
                   port = data['msg']
                   model_id = data['mid'] //id of newly created model
-                  workspace_div.append(getLoadingDiv(model_id))
+                  workspace_div.append(getLoadingDiv(model_id, cur_wid))
                   setTimeout(function(){
                       workspace_div.children().last().remove(); //remove loading element
                       workspace_div.append(getTrainingModelDiv(model_id, cur_wid, port)) 
