@@ -28,7 +28,6 @@ from django.contrib.auth.decorators import login_required
 from openrec import recommenders
 from time import time
 from bson import ObjectId
-import mimetypes
 from django.utils.encoding import smart_str
 
 logging.getLogger(__name__)
