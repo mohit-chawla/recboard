@@ -9,7 +9,6 @@ urlpatterns = [
     path('home/login', views.login_user),
     path('upload', views.upload, name='upload'),
     url(r'^home/$', views.HomePage.as_view(), name='home'),
-    url(r'^gg/$', views.GPage.as_view(), name='gpage'),
     path('user/workspace/recommender/list',views.list_recommenders,name='recommenders'),
     path('user/workspace/delete',views.delete_workspace,name='delete workspace'),
     path('user/workspace/model/delete',views.delete_model,name='delete model'),
