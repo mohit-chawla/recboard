@@ -1,6 +1,10 @@
 .top-buffer{
 	height:20px !important;
 }
+
+.model-notes{
+	font-style: italic;
+}
 .thick{
 	font-weight: bold;
 	color:#444;

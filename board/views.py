@@ -102,7 +102,7 @@ def list_models(request):
     print("models:",models)
     models_dict = {}
     for model in models:
-        models_dict[str(model.id)] = [model.status,model.port,model.file_location]
+        models_dict[str(model.id)] = [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time]
     print("models_dict:",models_dict)
     return JsonResponse(models_dict,safe=False)
 

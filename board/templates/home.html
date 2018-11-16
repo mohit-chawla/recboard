@@ -540,21 +540,43 @@
                 }else{
                   addWorkspaceToUI(workspace_id, workspace_details[0], false)
                 }
-                
+          
             }
             i+=1
           }
       }
+
+      function getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters){
+        return '\
+        <div class="col-md-12 col-sm-12 col-xs-12">\
+          <div class="col-md-6 col-sm-12 col-xs-12">\
+          <h5> Details</h5>\
+          <p >Train Iters: '+model_train_iters+'\
+          Eval Iters: '+model_eval_iters+'\
+          Save Iters: '+model_save_iters+'\
+          Trained at: '+model_starttime+'</p>\
+          </div>\
+          <div class=" col-md-6 col-sm-12 col-xs-12"><h5>Notes:</h5><span class="col-md-12 col-sm-12 col-xs-12 model-notes">'+model_notes+'</span></div>\
+        </div>\
+        '
+      }
+
       function getModelsDiv(models, wid){
           models_div= ""
           var models = eval(models);
           console.log("models:",models)
           for(var model_id in models){
               if (models.hasOwnProperty(model_id)){
-                  var model_details=models[model_id]; //[status,port,file_location]
-                  model_status = model_details[0]
-                  model_port = model_details[1]
-                  model_file_location = "user/workspace/model/download?mid="+model_id
+                  var model_details=models[model_id]; // [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time]
+                  var model_status = model_details[0]
+                  var model_port = model_details[1]
+                  var model_name = model_details[3]
+                  var model_notes = model_details[4]
+                  var model_train_iters = model_details[5]
+                  var model_eval_iters = model_details[6]
+                  var model_save_iters = model_details[7]
+                  var model_starttime = model_details[8]
+                  var model_file_location = "user/workspace/model/download?mid="+model_id
                   if (model_status == "TRAINED"){
                       // show download and deploy options
                       models_div += ('<div class="col-md-12 col-sm-12 col-xs-12" mid="'+model_id+'">\
@@ -583,8 +605,9 @@
                                           </div>\
                                           <div class="x_content">\
                                             <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
-                                                <button type="button" class="btn btn-primary">Download model</button>\
-                                                <button type="button" class="btn btn-warning">Deploy model</button>\
+                                                '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters)+'\
+                                                <button type="button" class="btn btn-sm btn-primary">Download model</button>\
+                                                <button type="button" class="btn btn-sm btn-warning">Deploy model</button>\
                                             </div>\
                                         </div>\
                                       </div>\
