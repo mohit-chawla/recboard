@@ -304,12 +304,7 @@
                             </select>
                           </div>
                         </div>
-                        <div class="form-group">
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Name</label>
-                          <div class="col-md-6 col-sm-6 col-xs-12">
-                            <input type="text" id="model-name" class="form-control col-md-7 col-xs-12">
-                          </div>
-                        </div>
+                        
                         <div class="ln_solid"></div>
                         <div>
                           <p>Hyperparams</p>
@@ -329,6 +324,20 @@
 
                           </div>
                         </div>
+                        <div class="ln_solid"></div>
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Name</label>
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" id="model-name" class="form-control col-md-7 col-xs-12">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Notes (Optional)</label>
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" id="model-notes" class="form-control col-md-7 col-xs-12">
+                          </div>
+                        </div>
+
                         <div class="ln_solid"></div>
                         <div class="form-group">
                           <div class="col-md-12 col-sm-12 col-xs-12">
@@ -729,19 +738,32 @@
         </div>'
       }
 
+      function resetCreateModelForm(){
+        $("#model-name").val("")
+        $("#model-notes").val("")
+      }
+
       // Train a model
       $(document).on('click', '#train-model-btn', function (e) {
           if (debug){
               console.log("Training model ...",)
           }
-          var cur_wid = $("span[cur-wid]").attr('cur-wid')  //wid of current workspace
-          var workspace_div = $('div[wid='+cur_wid+']') // get div of model from which this train btn was clicked
+          cur_wid = $("span[cur-wid]").attr('cur-wid')  //wid of current workspace
+          workspace_div = $('div[wid='+cur_wid+']') // get div of model from which this train btn was clicked
           
           selectedRecommender = $('#recommender-select').find(":selected").text()
           selectedTrainDatasetId = $('#train-dataset-select').find(':selected').attr('did')
           selectedTestDatasetId = $('#test-dataset-select').find(':selected').attr('did')
-          // model_name = $('#model-name').text()
           
+          //TODO: Evaluator and sampler here, just like dataset
+
+          model_train_iters = $("#train-iters").val()
+          model_save_iters = $("#save-iters").val()
+          model_eval_iters = $("#eval-iters").val()
+
+          model_name = $('#model-name').val()
+          model_notes = $("#model-notes").val()
+
           console.log("creating model for workspace",cur_wid)
           
           $.ajax({
@@ -753,6 +775,11 @@
                       test_dataset: selectedTestDatasetId,
                       recommender: selectedRecommender,
                       workspace_id: cur_wid,
+                      train_iters: model_train_iters,
+                      eval_iters: model_eval_iters,
+                      save_iters: model_save_iters,
+                      name: model_name,
+                      notes: model_notes
                   }),
               dataType : "json",
               success: function( data ){
@@ -763,6 +790,7 @@
                   setTimeout(function(){
                       workspace_div.children().last().remove(); //remove loading element
                       workspace_div.append(getTrainingModelDiv(model_id, cur_wid, port)) 
+                      resetCreateModelForm()
                   },iframeTimeout);
                   
               }

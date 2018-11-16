@@ -267,30 +267,40 @@ class HomePage(TemplateView):
 
 def create(request):
     body = get_request_body(request)
-
-    if not 'recommender' in body or not 'train_dataset' in body or not 'test_dataset' in body or not "workspace_id" in body:
-        return HttpResponseBadRequest("Bad request")
+    _required = ['recommender','train_dataset','test_dataset',"workspace_id","train_iters","eval_iters","save_iters"]
+    for key in _required:
+        if not key in body:
+            return HttpResponseBadRequest("Bad request")
 
     recommender = body['recommender']
     workspace_id = ObjectId(body['workspace_id'])
     train_dataset = db.get('dataset',id=ObjectId(body['train_dataset']))
     test_dataset = db.get('dataset',id=ObjectId(body['test_dataset']))
 
+    train_iters = body['train_iters']
+    eval_iters = body['eval_iters']
+    save_iters = body['save_iters']
+
     print ('Parent process pid:', os.getpid())
     user = get_dummy_user()
     body = get_request_body(request)
     
     if 'name' in body:
-        model_name = name #user provided custom name
+        model_name =body['name'] #user provided custom name
     else:
         model_name = get_model_default_name(user) #user did not provide name, create a name
 
+    notes = ""
+    if 'notes' in body:
+        notes = body['notes']
 
+    print("MODEL NAME:",model_name)
+    print("MODEL NOTES:",notes)
     # TODO: maintain a list of available ports later
     tensorboard_port = str(randint(6000,7000)) 
     print("port generated", tensorboard_port,"Starting tb")
 
-    model = Model(name=model_name,status=MODEL_STATUS_CREATED, train_dataset= train_dataset.id,test_dataset=test_dataset.id,logdir=LOG_DIR, port=tensorboard_port,workspace_id=workspace_id)
+    model = Model(name=model_name,train_iters=train_iters,eval_iters=eval_iters,save_iters=save_iters,notes=notes,status=MODEL_STATUS_CREATED, train_dataset= train_dataset.id,test_dataset=test_dataset.id,logdir=LOG_DIR, port=tensorboard_port,workspace_id=workspace_id)
     db.insert('model', model) #insert new model
     workspace = db.get('workspace',id=workspace_id)
     workspace.models.append(model.id)
