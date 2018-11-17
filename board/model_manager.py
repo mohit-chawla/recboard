@@ -22,7 +22,7 @@ from .constants import *
 FORMAT = '%(asctime)-15s %(message)s'
 
 class ModelManager:
-    def __init__(self,model_id, db, recommender_name, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
+    def __init__(self,model_id, db, recommender_name, train_iters, eval_iters, save_iters, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
         self.recommender_name = str(recommender_name).lower()
         self.train_sampler = train_sampler
         self.val_sampler = val_sampler
