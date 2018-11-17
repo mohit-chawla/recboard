@@ -1,6 +1,7 @@
 from django.db import models
 from mongoengine import *
 from bson import ObjectId
+from datetime import datetime
 
 #  #WARNING: NOT USED AS OF NOW
 # class UploadFile(models.Model):
@@ -27,6 +28,11 @@ class Model(Document):
 	port = StringField(max_length=5, required=True)
 	file_location = StringField(max_length=120)
 	workspace_id = ObjectIdField()
+	train_iters = IntField(min_value=1)
+	eval_iters = IntField(min_value=1)
+	save_iters = IntField(min_value=1)
+	start_time = DateTimeField(default=datetime.utcnow)
+	notes = StringField(max_length=240)
 	meta = {'collection': 'model'}
 
 	

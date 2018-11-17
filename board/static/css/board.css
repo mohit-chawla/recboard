@@ -1,6 +1,10 @@
 .top-buffer{
 	height:20px !important;
 }
+
+.model-notes{
+	font-style: italic;
+}
 .thick{
 	font-weight: bold;
 	color:#444;
@@ -50,16 +54,13 @@
 	align-items: center;
 	margin-left: 3px;
 }
-
+.workspace-action:hover{
+	cursor: pointer;
+    color:#5f7082;
+}
 .toggleWorkspace{
 	background-color: #FFCD00;
 	border: #e8bd14 solid 1px;
-}
-
-.deleteWorkspace{
-	font-size:14px !important;
-	background-color: #FF6159;
-	border: #e53c37 solid 1px;
 }
 
 .workspaceSettings{
@@ -85,11 +86,6 @@
 
 .model-div{
 	border:solid 10px #eafeea;
-	padding:10px 10px 10px 10px;
-}
-
-.model-loading-div{
-	border:solid 10px #ffe3b1;
 	padding:10px 10px 10px 10px;
 }
 

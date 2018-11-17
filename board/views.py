@@ -28,6 +28,7 @@ from django.contrib.auth.decorators import login_required
 from openrec import recommenders
 from time import time
 from bson import ObjectId
+from django.utils.encoding import smart_str
 
 logging.getLogger(__name__)
 
@@ -101,7 +102,7 @@ def list_models(request):
     print("models:",models)
     models_dict = {}
     for model in models:
-        models_dict[str(model.id)] = [model.status,model.port,model.file_location]
+        models_dict[str(model.id)] = [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time]
     print("models_dict:",models_dict)
     return JsonResponse(models_dict,safe=False)
 
@@ -226,6 +227,38 @@ def delete_workspace(request):
     db.delete('workspace',id=ObjectId(wid))
     return JsonResponse("Deleted",safe=False)
 
+
+def _serve(filename,file_path):
+    """Serves a file"""
+    if not filename or not file_path:
+        raise InvalidArgumentException
+
+    response = HttpResponse(content_type='application/force-download') 
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(filename)
+    response['X-Sendfile'] = smart_str(file_path)
+    
+    return response
+
+
+def download_model(request):
+    """Serves a model file with model-id:mid"""
+    mid = request.GET.get('mid','')
+    if not mid:
+        return JsonResponse("",safe=False)
+
+    print("requested mdoel file for",mid)   
+    
+    filename = "model.ckpt.index"
+    file_path = "data/"+mid+"/{0}".format(filename)
+
+    try:
+        response = _serve(filename, file_path)
+    except:
+        response = HttpResponseBadRequest("Model file not found")
+
+    return response
+
+
 class HomePage(TemplateView):
     """
         This is a class based view for home page (/home)
@@ -234,30 +267,40 @@ class HomePage(TemplateView):
 
 def create(request):
     body = get_request_body(request)
-
-    if not 'recommender' in body or not 'train_dataset' in body or not 'test_dataset' in body or not "workspace_id" in body:
-        return HttpResponseBadRequest("Bad request")
+    _required = ['recommender','train_dataset','test_dataset',"workspace_id","train_iters","eval_iters","save_iters"]
+    for key in _required:
+        if not key in body:
+            return HttpResponseBadRequest("Bad request")
 
     recommender = body['recommender']
     workspace_id = ObjectId(body['workspace_id'])
     train_dataset = db.get('dataset',id=ObjectId(body['train_dataset']))
     test_dataset = db.get('dataset',id=ObjectId(body['test_dataset']))
 
+    train_iters = body['train_iters']
+    eval_iters = body['eval_iters']
+    save_iters = body['save_iters']
+
     print ('Parent process pid:', os.getpid())
     user = get_dummy_user()
     body = get_request_body(request)
     
     if 'name' in body:
-        model_name = name #user provided custom name
+        model_name =body['name'] #user provided custom name
     else:
         model_name = get_model_default_name(user) #user did not provide name, create a name
 
+    notes = ""
+    if 'notes' in body:
+        notes = body['notes']
 
+    print("MODEL NAME:",model_name)
+    print("MODEL NOTES:",notes)
     # TODO: maintain a list of available ports later
     tensorboard_port = str(randint(6000,7000)) 
     print("port generated", tensorboard_port,"Starting tb")
 
-    model = Model(name=model_name,status=MODEL_STATUS_CREATED, train_dataset= train_dataset.id,test_dataset=test_dataset.id,logdir=LOG_DIR, port=tensorboard_port,workspace_id=workspace_id)
+    model = Model(name=model_name,train_iters=train_iters,eval_iters=eval_iters,save_iters=save_iters,notes=notes,status=MODEL_STATUS_CREATED, train_dataset= train_dataset.id,test_dataset=test_dataset.id,logdir=LOG_DIR, port=tensorboard_port,workspace_id=workspace_id)
     db.insert('model', model) #insert new model
     workspace = db.get('workspace',id=workspace_id)
     workspace.models.append(model.id)
