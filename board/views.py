@@ -102,7 +102,7 @@ def list_models(request):
     print("models:",models)
     models_dict = {}
     for model in models:
-        models_dict[str(model.id)] = [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time]
+        models_dict[str(model.id)] = [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time,model.recommender]
     print("models_dict:",models_dict)
     return JsonResponse(models_dict,safe=False)
 
@@ -277,9 +277,9 @@ def create(request):
     train_dataset = db.get('dataset',id=ObjectId(body['train_dataset']))
     test_dataset = db.get('dataset',id=ObjectId(body['test_dataset']))
 
-    train_iters = body['train_iters']
-    eval_iters = body['eval_iters']
-    save_iters = body['save_iters']
+    train_iters = int(body['train_iters'])
+    eval_iters = int(body['eval_iters'])
+    save_iters = int(body['save_iters'])
 
     print ('Parent process pid:', os.getpid())
     user = get_dummy_user()
@@ -300,7 +300,7 @@ def create(request):
     tensorboard_port = str(randint(6000,7000)) 
     print("port generated", tensorboard_port,"Starting tb")
 
-    model = Model(name=model_name,train_iters=train_iters,eval_iters=eval_iters,save_iters=save_iters,notes=notes,status=MODEL_STATUS_CREATED, train_dataset= train_dataset.id,test_dataset=test_dataset.id,logdir=LOG_DIR, port=tensorboard_port,workspace_id=workspace_id)
+    model = Model(name=model_name,recommender=recommender,train_iters=train_iters,eval_iters=eval_iters,save_iters=save_iters,notes=notes,status=MODEL_STATUS_CREATED, train_dataset= train_dataset.id,test_dataset=test_dataset.id,logdir=LOG_DIR, port=tensorboard_port,workspace_id=workspace_id)
     db.insert('model', model) #insert new model
     workspace = db.get('workspace',id=workspace_id)
     workspace.models.append(model.id)
@@ -311,7 +311,7 @@ def create(request):
     # TODO: ensure user.id is not None
     dataset_path = DATASET_PATH_PREFIX+str(user.id)+"_file_"+train_dataset.name
     print("\n\n Fetching dataset from path = ", dataset_path ,"\n\n")
-    model_controller_obj = ModelManager(model_id, db, recommender, 'train_samp', 'val_samp', 'test_samp', 'AUC', dataset_path)
+    model_controller_obj = ModelManager(model_id, db, recommender, train_iters, eval_iters, save_iters, 'train_samp', 'val_samp', 'test_samp', 'AUC', dataset_path)
     
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()
