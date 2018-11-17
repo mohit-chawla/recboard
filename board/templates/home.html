@@ -1,472 +1,1079 @@
-{% extends 'base.html' %}
-{% block title %}Home{% endblock title %}
+{% if user.is_authenticated %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{% block content %}  
+    <title>recboard </title>
+    <link rel="shortcut icon" type="image/png" href="{{STATIC_URL}}/static/brand/recboard.png"/>
+    <!-- Bootstrap -->
+    <link href="{{STATIC_URL}}/static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{{STATIC_URL}}/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="{{STATIC_URL}}/static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- bootstrap-progressbar -->
+    <link href="{{STATIC_URL}}/static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="{{STATIC_URL}}/static/build/css/custom.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}/static/css/board.css" rel="stylesheet">
+  </head>
 
-    {# Hero Section #}  
-    {# Main Section #}
-    <head>
-        <meta charset="utf-8">
-        {% load static %}
-        <link href="{% static 'css/dropzone.css' %}" type="text/css" rel="stylesheet"/>
-        <script type="text/javascript" src="{% static 'js/dropzone.js' %}"></script>
-    </head>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div class="container">
-        <a class="navbar-brand" href="#"><img src="{% static 'brand/recboard.png' %} " height="25px" width="25px" > <span class="text-muted"> | </span> recboard</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="#">Home
-                <span class="sr-only">(current)</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://github.com/mohit-chawla/recboard">Github</a>
-            </li>
-            {% if user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link active" href="#"><i class="fa fa-user-circle"></i> {{ user.username }}</a>
-            </li> 
-            
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'logout' %}"> Log out</a>
-            </li>
-            {% endif %}
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <body>
-        
-        <div class="container-fluid">
-            <!-- IMPORTANT enctype attribute! -->
-            <div class="row top-buffer">
-                <div class="col-md-12">
-                </div>
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a href="index.html" class="site_title"><img src="{{STATIC_URL}}/static/brand/recboard.png" height="35px"> <span>recboard</span></a>
             </div>
-            <div class="row board-content-outer-div">
-                <div class="col-md-6 board-content-div">
-                    <div id="datasets-div">
-                    </div>
+
+            <div class="clearfix"></div>
+
+            <!-- menu profile quick info -->
+            <div class="profile clearfix">
+              <div class="profile_pic">
+                <img src="{{STATIC_URL}}/static/img/mohit.jpg" alt="..." class="img-circle profile_img">
+              </div>
+              <div class="profile_info">
+                <span>Welcome,</span>
+                <h2>Mohit Chawla</h2>
+              </div>
+            </div>
+            <!-- /menu profile quick info -->
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <h3>Workspaces</h3>
+                <ul class="nav side-menu" id="workspaces-nav-ul">
+                  <li data-toggle="modal" data-target=".workspace-create-modal"><a><i class="fa fa-plus" type="button"></i>Create new</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="menu_section">
+                <h3>Deployments</h3>
+                <ul class="nav side-menu">
+                  <li><a><i class="fa fa-check"></i> Deployed <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="form.html">Deploy_1</a></li>
+                      <li><a href="form.html">Deploy_2</a></li>
+                      <li><a href="form.html">Deploy_3</a></li>
+                      <li><a href="form.html">Deploy_4</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-gear"></i> Configurations <span class="label label-success pull-right">Coming Soon</span> </a>
+                  </li>
+                  <li><a><i class="fa fa-search"></i> Monitoring  <span class="label label-success pull-right">Coming Soon</span></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- /sidebar menu -->
+
+            <!-- /menu footer buttons -->
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="{% url 'logout' %}">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            <!-- /menu footer buttons -->
+          </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav>
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <img src="{{STATIC_URL}}/static/img/mohit.jpg" alt="">Mohit Chawla
+                    <span class=" fa fa-angle-down"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    <li><a href="javascript:;"> Profile</a></li>
+                    <li>
+                      <a href="javascript:;">
+                        <span class="badge bg-red pull-right">50%</span>
+                        <span>Settings</span>
+                      </a>
+                    </li>
+                    <li><a href="javascript:;">Help</a></li>
+                    <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                  </ul>
+                </li>
+
+                <li role="presentation" class="dropdown">
+                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-envelope-o"></i>
+                    <span class="badge bg-green">2</span>
+                  </a>
+                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                    <li>
+                      <a>
+                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
+                        <span>
+                          <span>AML Workspace</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Model 2131233243 finished training
+                        </span>
+                      </a>
+                    </li>
+                    <li>
+                      <a>
+                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
+                        <span>
+                          <span>NLP Workspace</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Error in asdfds testing
+                        </span>
+                      </a>
+                    </li>
+                    <li>
+                      <div class="text-center">
+                        <a>
+                          <strong>See All Alerts</strong>
+                          <i class="fa fa-angle-right"></i>
+                        </a>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <!-- top tiles -->
+
+          <h2>
+            <div class="col-xs-10 col-sm-10 col-xs-10">
+              <span id="cur-workspace-name">Workspace1</span> 
+            </div> 
+            <div class="col-md-2 col-sm-2 col-xs-2">
+              <i class=" col-md-2 col-sm-2 col-xs-2 workspace-action fa fa-gears"></i>
+              <i data-toggle="modal" data-target=".workspace-delete-modal" class=" col-md-2 col-sm-2 col-xs-2 workspace-action fa fa-trash"></i>
+            </div>
+          </h2>
+          <div class="ln_solid col-md-12 col-sm-12 col-xs-12"></div>
+          <div class="row tile_count">
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Total Models</span>
+              <div class="count" id="cur-workspace-models-cnt">0</div>
+              <span class="count_bottom"><i class="green" id="cur-workspace-completed-models-cnt">0</i> complete</span>
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-clock-o"></i> Average Training Time</span>
+              <div class="count">12.5</div>
+              <!-- <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>3% </i> From last Week</span> -->
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Ongoing Sessions</span>
+              <div class="count blue" id="cur-workspace-ongoing-models-cnt">-1</div>
+              <!-- <span class="count_bottom">ABCD</span> -->
+            </div>
+          </div>
+          <div class="modal fade workspace-create-modal" id="workspace-create-modal-id" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                  </button>
+                  <h4 class="modal-title" id="myModalLabel">Create new Workspace</h4>
                 </div>
-                <div class="col-md-6 board-content-div">
-                    <h4 >Upload new dataset</h4>
-                    <hr>
-                    <form class="dropzone" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
-                        {% csrf_token %}
-                    </form>
-                    <button id="upload-file" class="btn btn-secondary">
+                <div class="modal-body">
+                  <form id="create-workspace-form" data-parsley-validate class="form-horizontal form-label-left">
+                    <div class="form-group">
+                      <label class="control-label col-md-2 col-sm-4 col-xs-12" for="model-name">Name</label>
+                      <div class="col-md-8 col-sm-8 col-xs-12">
+                        <input type="text" id="new-workspace-name" class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="control-label col-md-2 col-sm-4 col-xs-12" for="model-name">Description</label>
+                      <div class="col-md-8 col-sm-8 col-xs-12">
+                        <input type="text" id="new-workspace-desc" class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary" id="create-workspace-btn"><i class="fa fa-plus"></i> Create</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="modal fade workspace-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                  </button>
+                  <h4 class="modal-title">Delete Workspace</h4>
+                </div>
+                <div class="modal-body">
+                  <h5>Are you sure you want to delete this workspace?</h5><br/>
+                  (This will delete everything related to this workspace permanently!)
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-danger" id="delete-workspace-confirm" data-dismiss="modal">Yes! Delete It</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <!-- /top tiles -->
+          <div class="row">
+            <!-- Add model to workspace -->
+            <div class="col-md-8 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2><i class="fa fa-plus"></i> Add new model to workspace</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <form id="add-new-model-form" data-parsley-validate class="form-horizontal form-label-left">
+                      <p>Params</p>
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Recommender</label>
+                          <div  class="col-md-9 col-sm-9 col-xs-12">
+                            <select id="recommender-select" class="form-control">
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Train Dataset</label>
+                          <div class="col-md-3 col-sm-3 col-xs-12">
+                            <select id="train-dataset-select" class="form-control">
+                            </select>
+                          </div>
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Test Dataset</label>
+                          <div class="col-md-3 col-sm-3 col-xs-12">
+                            <select id="test-dataset-select" class="form-control">
+                            </select>
+                          </div>
+                        </div>
+                          <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Evaluator</label>
+                          <div class="col-md-3 col-sm-3 col-xs-12">
+                            <select required="required" class="form-control">
+                              <option>Choose option</option>
+                              <option>Option one</option>
+                              <option>Option two</option>
+                              <option>Option three</option>
+                              <option>Option four</option>
+                            </select>
+                          </div>
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Sampler</label>
+                          <div class="col-md-3 col-sm-3 col-xs-12">
+                            <select required="required" class="form-control">
+                              <option>Choose option</option>
+                              <option>Option one</option>
+                              <option>Option two</option>
+                              <option>Option three</option>
+                              <option>Option four</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        <div class="ln_solid"></div>
+                        <div>
+                          <p>Hyperparams</p>
+                          <div class="form-group">
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Training Iters</label>
+                            <div class="col-md-2 col-sm-3col-xs-12">
+                              <input type="number" id="train-iters" value="1000" class="form-control col-md-7 col-xs-12">
+                            </div>
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Eval Iters</label>
+                            <div class="col-md-2 col-sm-3c ol-xs-12">
+                              <input type="number" id="eval-iters" value="1000" class="form-control col-md-7 col-xs-12">
+                            </div>
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Save Iters</label>
+                            <div class="col-md-2 col-sm-3 col-xs-12">
+                              <input type="number" id="save-iters" value="1000" class="form-control col-md-7 col-xs-12">
+                            </div>
+
+                          </div>
+                        </div>
+                        <div class="ln_solid"></div>
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Name</label>
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" id="model-name" class="form-control col-md-7 col-xs-12">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Notes (Optional)</label>
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" id="model-notes" class="form-control col-md-7 col-xs-12">
+                          </div>
+                        </div>
+
+                        <div class="ln_solid"></div>
+                        <div class="form-group">
+                          <div class="col-md-12 col-sm-12 col-xs-12">
+                            <center>
+                              <span id="train-model-btn" class="btn btn-success btn-block">Create & Start Training</span>
+                            </center>
+                          </div>
+                        </div>
+
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2><i class="fa fa-file"></i>  Datasets</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <p>Upload new dataset</p>
+                  
+                  <form class="dropzone form-group" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
+                      {% csrf_token %}
+                  </form>
+                  <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Name</label>
+                    <div class="col-md-9 col-sm-9 col-xs-12">
+                      <input type="text" id="dataset-name" class="form-control">
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label col-md-3 col-sm-6 col-xs-12">Tags</label>
+                    <div class="col-md-9 col-sm-9 col-xs-12">
+                      <input id="tags_1" type="text" class="tags form-control" value="social, adverts, sales"/>
+                      <div id="suggestions-container" style="position: relative; float: left; width: 250px; margin: 10px;"></div>
+                    </div>
+                  </div>
+                  <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                    <button type="button" id="upload-file" class="btn btn-primary">
                         Upload <i class="fa fa-cloud-upload"></i>
                     </button>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-primary" role="progressbar" data-dz-uploadprogress>
-                            <span class="progress-text"></span>
-                        </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="ln_solid"></div>
+                    <p>Existing</p>
+                    <div id="datasets-div">
                     </div>
+                  </div>
                 </div>
+              </div>
             </div>
-           
-
-            <!-- <hr> -->
-            
-            <!-- Workspaces start here -->
-            <div id="create-workspace-div" class="row board-content-outer-div">
-                <div class="col-md-12 board-content-div">
-                    <span class="glyphicon glyphicon-search"></span>
-                    <h2>Workspaces</h2>
-                    <hr>
-                    <h4>Create new workspace</h4>
-                    <input type="text" name="workspace-name" id="new-workspace-name"/>
-                    <button id="create-workspace-btn" class="btn btn-secondary">Create Workspace <i class="fa fa-plus"></i></button>
-                </div>
+            <!-- Existing models in workspace -->
+            <div id="workspaces-div">
             </div>
-
-            <div id="workspaces-div" class="row board-content-outer-div">
-            </div> 
-            <!-- Workspaces end here -->
-            <script type="text/javascript">
-                var hostname = window.location.origin
-                var user_root_url  = hostname + "/board/user"
-                var workspace_root_url = user_root_url + "/workspace"
-                var dataset_root_url = user_root_url + "/dataset"
-                debug = true
-                var userDatasets = [];
-                var availableRecommdenders = [];
-                var iframeTimeout = 10000
-
-                function getWorkspaceList(){
-                    url = workspace_root_url + "/list"
-                    if (debug){
-                        console.log("listing workspaces",url)   
-                    }
-                    $.get( url, function( workspaces ) {
-                        console.log(workspaces)
-                        addWorkspacesToUI(workspaces)
-                    });
-                }
-
-                function getWorkspaceModelsList(wid,cb){
-                    url =workspace_root_url + "/model/list"+"?wid="+wid
-                    
-                    if (debug){
-                        console.log("listing workspace models",url) 
-                    }
-
-                    $.get(url, function( data ){
-                            console.log("data:",data)
-                            data = eval(data)
-                            console.log("Listed workspace models:",data)
-                            if(cb && typeof cb === "function") {
-                                return cb(data);
-                            }
-                    });
-                }
-
-                function getDatasetList(cb){
-                    url = dataset_root_url + "/list"
-                    if (debug){
-                        console.log("listing datasets",url)   
-                    }
-                    $.get( url, function( data ) {
-                        addDatasetsToUI(data)                    
-                        $.each(data,function( _ , dataset){
-                            userDatasets.push(dataset)
-                        });
-                        if(cb && typeof cb === "function") {
-                            cb();
-                        }
-                    });
-                }
-
-
-                function getAvailableRecommenders(cb){
-                    url = workspace_root_url + "/recommender/list"
-                    if (debug){
-                        console.log("listing available recommenders",url)   
-                    }
-                    $.get( url, function( data ) {
-                        $.each(data,function( _ , dataset){
-                            availableRecommdenders.push(dataset)
-                        });
-                        if(cb && typeof cb === "function") {
-                            cb();
-                        }
-                    });
-                }
-
-                function modelDatasetOptionsUI(){
-                    options = ""
-                    $.each(userDatasets, function(i,ds){
-                        options += '<option did="'+ds[0]+'">'+ds[1]+'</option>'
-                    });
-                    return options
-                }
-
-                function modelRecommenderOptionsUI(){
-                    options = ""
-                    $.each(availableRecommdenders, function(i,recommender){
-                        options += "<option>"+recommender+"</option>"
-                    });
-                    return options  
-                }
-
-                function createModelForm(workspace){
-                    //Creates form to create a model in workspace
-                    options = modelDatasetOptionsUI()
-
-                    return '<div class="createModel col-md-12"> Recommender <select class="recommenderSelect"> '+modelRecommenderOptionsUI()+'</select> Train Dataset <select id="train-datasetSelect" class="datasetSelect">'+modelDatasetOptionsUI()+'</select> Test Dataset <select id="test-datasetSelect" class="datasetSelect">'+modelDatasetOptionsUI()+'</select> <button class="trainModel btn btn-primary">Train <i class="fa fa-superpowers"></i></button> </div>'
-                }
-
-                function addWorkspacesToUI(workspaces){
-                    //clear existing workspaces
-                    var workspaces = eval(workspaces);
-                    for(var workspace_id in workspaces){
-                        if (workspaces.hasOwnProperty(workspace_id)){
-                            var workspace_details=workspaces[workspace_id]; //[name]
-                            addWorkspaceToUI(workspace_id, workspace_details[0])
-                        }
-                    }
-                    // $.each(workspaces,function(_,workspace){
-                    //     addWorkspaceToUI(workspace)
-                    // });
-                }
-                function getModelsDiv(models){
-                    models_div= ""
-                    var models = eval(models);
-                    console.log("models:",models)
-                    for(var model_id in models){
-                        if (models.hasOwnProperty(model_id)){
-                            var model_details=models[model_id]; //[status,port,file_location]
-                            model_status = model_details[0]
-                            model_port = model_details[1]
-                            model_file_location = model_details[2]
-                            if (model_status == "TRAINED"){
-                                // show download and deploy options
-                                models_div += ('<div mid="'+model_id+'" class="model-div" mstatus="'+model_status+'">Model:'+model_id+'<a href="'+model_file_location+'"><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
-                            }else{
-                                //show iframe
-                                models_div += ('<div mid ="'+model_id+'" class="model-div" mstatus="'+model_status+'">Model:'+model_id+'<br/><iframe src="http://localhost:'+model_port+'"height="800px" width="100%"></iframe><span class="modelStatus">'+model_status+'</span><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span></div>')
-                            }
-
-                        }
-                    }
-                    console.log("here",models_div)
-                    return models_div
-                }
-                
-                function addWorkspaceToUI(workspace_id, workspace_name){
-                    url =workspace_root_url + "/model/list"+"?wid="+workspace_id
-                    
-                    if (debug){
-                        console.log("listing workspace models",url) 
-                    }
-
-                    $.get(url, function( data ){
-                        console.log("data:",data)
-                        data = eval(data)
-                        console.log("Listed workspace models:",data)
-                        models_div = getModelsDiv(data)
-
-                        // models_div = getWorkspaceModelsList(workspace_id,getModelsDiv)                        
-                        console.log("models_div",models_div)
-                    //add single workspace to UI
-                        $("#workspaces-div").prepend('<div wid='+workspace_id+' class="workspace col-md-12"><div class="row workspaceNav"><div class="col-md-11"><span class="workspaceName">'+workspace_name+'</span></div><div class="col-md-1"><i class="fa fa-window-minimize toggleWorkspace workspaceAction"></i><i class="fa fa-trash deleteWorkspace workspaceAction"></i> <i class="fa fa-gear workspaceSettings workspaceAction"></i></div></div><span class="workspaceBody"> <div class="col-md-12"> <span class="thick">Add model to workspace </span></div>'+createModelForm()+' <span style="float:right"></span>'+models_div+'</span></div>')     
-                    });
-                }
-
-                function datasetUIOptions(){
-                    renameOption = '<i class="fa fa-pencil datasetElOptions"></i>'
-                    deleteOption = '<i class="fa fa-trash datasetElOptions"></i>'
-                    return renameOption + deleteOption
-                }
-                function addDatasetsToUI(datasets){
-                    $("#datasets-div").empty()
-                    $("#datasets-div").append('<h4>Uploaded datasets</h4><hr>')
-                    n = $(datasets).size()
-                    if (n == 0){
-                        $("#datasets-div").append("No dataset, please upload new")
-                    }
-                    else{
-                        $.each(datasets, function(_, dataset){
-                            $("#datasets-div").append('<div did="'+dataset[0]+'"> <i class="fa fa-file" style="color:#7ec0ee"></i> '+dataset[1]+datasetUIOptions()+'</div>')       
-                        });
-                    }
-                }
-
-                function getTBPort(){
-                    // Get port of tensorboard for this model
-                    url = workspace_root_url + "/model/port"
-                    $.get( url, function( data ) {
-                        console.log("retrieved port ..",data['port'])
-                        return data["port"]
-                    });
-                }
-                function getLoadingDiv(){
-                    return '<div class="model-loading-div" height="800px" width="100%"><center> Loading training details.. <br/> <img src="{% static "img/loading.gif" %}"></center></div>'
-                }
-
-                // Train a model
-                $(document).on('click', '.trainModel', function (e) {
-                    if (debug){
-                        console.log("Training model ...",)
-                        var workspaces_div = $(this).parent().parent() // get div of model from which this train btn was clicked
-
-                        
-                    }
-                    
-                    selectedRecommender = $(this).siblings('.recommenderSelect').find(":selected").text()
-                    selectedTrainDatasetId = $(this).siblings('#train-datasetSelect').find(':selected').attr('did')
-                    selectedTestDatasetId = $(this).siblings('#test-datasetSelect').find(':selected').attr('did')
-                    parentWorkspaceDiv = $(this).parent().parent().parent()
-                    parentWorkspaceId = $(this).parent().parent().parent().attr('wid')
-                    console.log("creating model for workspace",parentWorkspaceId)
-                    
-                    $.ajax({
-                        url : workspace_root_url+"/model/train",
-                        type: "POST",
-                        data : JSON.stringify({
-                                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-                                train_dataset: selectedTrainDatasetId,
-                                test_dataset: selectedTestDatasetId,
-                                recommender: selectedRecommender,
-                                workspace_id: parentWorkspaceId,
-                            }),
-                        dataType : "json",
-                        success: function( data ){
-                            console.log("training requested ...",data)
-                            port = data['msg']
-                            model_id = data['mid'] //id of newly created model
-                            workspaces_div.append(getLoadingDiv())
-                            setTimeout(function(){
-                                workspaces_div.children().last().remove(); //remove loading element
-                                workspaces_div.append('<div mid ="'+model_id+'"class="model-div">Model:'+model_id+'<br/><iframe src="http://localhost:'+port+'"height="800px" width="100%"></iframe><span class="modelStatus">CREATED</span><span class="modelOptions danger"><i class="fa fa-stop"></i>Cancel</span><span class="modelOptions"><i class="fa fa-download"></i> Download</span><span class="modelOptions"> <i class="fa fa-upload"></i> Deploy</span></div>') 
-                            },iframeTimeout);
-                            
-                        }
-                    });
-                });
-
-                  $.ajaxSetup({beforeSend: function(xhr, settings){
-                    xhr.setRequestHeader('X-CSRFToken', 
-                                         '{{ csrf_token }}');
-                  }});
-                
-
-                // Create new workspace
-                $(document).on('click', '#create-workspace-btn', function () {
-                    var new_workspace_name = $("#new-workspace-name").val()
-                    if (new_workspace_name != ""){
-                        if (debug){
-                            console.log("Creating new workspace ...", new_workspace_name)
-                        }
-                        $.ajax({
-                            url : workspace_root_url+"/create",
-                            type: "POST",
-                            data : JSON.stringify({workspace_name:new_workspace_name}),
-                            dataType : "json",
-                            success: function( new_workspace_details ){
-                                wid = new_workspace_details[0]
-                                name = new_workspace_details[1]
-                                console.log("workspace created ..., updating UI", new_workspace_details)
-                                addWorkspaceToUI(wid, name)
-                                $("#new-workspace-name").val("")
-                            }
-                        });
-                    }
-                });
-
-                $(document).on('click','.toggleWorkspace',function(e) {
-                  if ($(this).hasClass('fa-window-minimize')){
-                    $(this).removeClass('fa-window-minimize').addClass('fa-window-maximize')
-                  }
-                  else{
-                    $(this).removeClass('fa-window-maximize').addClass('fa-window-minimize')
-                  }
-                  $(this).parent().parent().siblings('.workspaceBody').slideToggle()
-                });
-
-                $(function () {
-                  $('[data-toggle="tooltip"]').tooltip()
-                });
-                
-                $(document).on('click','.deleteWorkspace',function(e) {
-                    wid = $(this).parent().parent().parent().attr('wid')
-                    $.ajax({
-                        url : workspace_root_url+"/delete",
-                        type: "DELETE",
-                        data : JSON.stringify({wid:wid}),
-                        dataType : "json",
-                        success: function(data){
-                            alert("Deleting the workspace..")
-                            console.log($(this).parent().parent().parent())
-                            $( "div[wid='"+wid+"']").remove()
-                        }
-                    });
-                });
-
-                $(document).on('click','.deleteModel',function(e) {
-                    mid = $(this).parent().attr('mid')
-                    console.log("trying to del,",mid)
-                    $.ajax({
-                        url : workspace_root_url+"/model/delete",
-                        type: "DELETE",
-                        data : JSON.stringify({mid:mid}),
-                        dataType : "json",
-                        success: function(data){
-                            alert("Deleting the model..")
-                            $( "div[mid='"+mid+"']").remove()
-                        }
-                    });
-                });
-
-
-                // var 
-                $(window).load(function(){
-                    // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
-                    getAvailableRecommenders(getDatasetList(getWorkspaceList));
-                    var modelStatusCheck = setInterval(function(){
-                        model_divs = $("div[mid]")
-                        $.each(model_divs, function(_ , md){
-                            mid = $(md).attr('mid')
-                            statusUI = $(md).attr('mstatus')
-                            if (debug){
-                                console.log("checking status for ",mid)    
-                            }
-                            url = workspace_root_url + "/model/status"+"?mid="+mid
-                            $.get( url, function( model_status ) {
-                                if (model_status == "TRAINED" & statusUI != 'TRAINED'){ //bug
-                                    $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
-                                }
-                            });    
-                        });
-                    }, 10000);
-                });
-
-
-
-            </script>
-            <script src="{% static 'js/dropzone.js' %}"></script>
-            <script type="text/javascript">
-                Dropzone.options.myDropzone = {
-                    acceptedFiles: ".xls,.csv,.xlsx,.dat",
-                    maxFiles:1,
-                    addRemoveLinks: true,
-                    // Prevents Dropzone from uploading dropped files immediately
-                    autoProcessQueue : false,
-                    
-                    accept: function(file, done) {
-                        console.log("uploaded");
-                        done();
-                    },
-                    
-                    init: function() {
-
-                        myDropzone = this;
-                        var submitButton = document.querySelector("#upload-file")
-                        
-                        submitButton.addEventListener("click", function() {
-                            myDropzone.processQueue();
-                            // Tell Dropzone to process all queued files.
-                        });
-
-                        this.on("maxfilesexceeded", function(file){
-                            alert("You can upload only one dataset at a time.");
-                            this.removeFile(file)
-                        });
-
-                        this.on("complete", function (file) {
-                          if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
-                            // Actions that needed to be done after all uplaods complete
-                            this.removeFile(file)
-                            $(".progress-text").text("All uploads completed")
-                            getDatasetList(); 
-                          }
-                        });
-
-                    
-                    },
-
-                    //shows upload progress bar
-                    uploadprogress: function(file, progress, bytesSent) {
-                        if (file.previewElement) {
-                            progressElement = file.previewElement.querySelector("[data-dz-uploadprogress]");
-                            progressElement.style.width = progress + "%";
-                            $(".progress-text").text(progress + "%")
-                        }
-                    }
-
-                };
-            </script>
         </div>
-    </body>
+      </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="pull-right">
+            Recboard <a href="https://github.com/mohit-chawla/recboard">Github</a>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="{{STATIC_URL}}/static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{{STATIC_URL}}/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="{{STATIC_URL}}/static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="{{STATIC_URL}}/static/vendors/nprogress/nprogress.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="{{STATIC_URL}}/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- jQuery Tags Input -->
+    <script src="{{STATIC_URL}}/static/vendors/jquery.tagsinput/src/jquery.tagsinput.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="{{STATIC_URL}}/static/build/js/custom.min.js"></script>
+    <script src="{{STATIC_URL}}/static/js/dropzone.js"></script>
+    <script type="text/javascript">
+      
+      var hostname = window.location.origin
+      var user_root_url  = hostname + "/board/user"
+      var workspace_root_url = user_root_url + "/workspace"
+      var dataset_root_url = user_root_url + "/dataset"
+      debug = true
+      var userDatasets = [];
+      var availableRecommdenders = [];
+      var iframeTimeout = 10000
+
+      function getWorkspaceList(){
+          url = workspace_root_url + "/list"
+          if (debug){
+              console.log("listing workspaces",url)   
+          }
+          $.get( url, function( workspaces ) {
+              // console.log(workspaces)
+              addWorkspacesToUI(workspaces)
+          });
+      }
+
+      function getWorkspaceModelsList(wid,cb){
+          url =workspace_root_url + "/model/list"+"?wid="+wid
+          
+          if (debug){
+              console.log("listing workspace models",url) 
+          }
+
+          $.get(url, function( data ){
+                  // console.log("data:",data)
+                  data = eval(data)
+                  console.log("Listed workspace models:",data)
+                  if(cb && typeof cb === "function") {
+                      return cb(data);
+                  }
+          });
+      }
+
+      function getDatasetList(cb){
+          url = dataset_root_url + "/list"
+          if (debug){
+              console.log("listing datasets",url)   
+          }
+          $.get( url, function( data ) {
+              addDatasetsToUI(data)                    
+              $.each(data,function( _ , dataset){
+                  userDatasets.push(dataset)
+              });
+              $("#train-dataset-select").append(modelDatasetOptionsUI())
+              $("#test-dataset-select").append(modelDatasetOptionsUI())
+              if(cb && typeof cb === "function") {
+                  cb();
+              }
+          });
+      }
+
+
+      function getAvailableRecommenders(cb){
+          url = workspace_root_url + "/recommender/list"
+          if (debug){
+              console.log("listing available recommenders",url)   
+          }
+          $.get( url, function( data ) {
+              $.each(data,function( _ , dataset){
+                  availableRecommdenders.push(dataset)
+              });
+              $("#recommender-select").append(modelRecommenderOptionsUI());
+              if(cb && typeof cb === "function") {
+                  cb();
+              }
+          });
+      }
+
+      function modelDatasetOptionsUI(){
+          options = ""
+          $.each(userDatasets, function(i,ds){
+              options += '<option did="'+ds[0]+'">'+ds[1]+'</option>'
+          });
+          return options
+      }
+
+      function modelRecommenderOptionsUI(){
+          options = ""
+          $.each(availableRecommdenders, function(i,recommender){
+              options += "<option>"+recommender+"</option>"
+          });
+          return options  
+      }
+
+      function setCurrentWorkspaceModelsCnt(val){
+        $("#cur-workspace-models-cnt").text(val)
+      } 
+      function setCurrentWorkspaceCompletedModelsCnt(val){
+        $("#cur-workspace-completed-models-cnt").text(val)
+      }
+
+      function setCurrentWorkspaceOngoingModelsCnt(val){
+        $("#cur-workspace-ongoing-models-cnt").text(val)
+      }
+
+      function addWorkspacesToUI(workspaces){
+          //clear existing workspaces
+          var workspaces = eval(workspaces);
+          i=0
+          for(var workspace_id in workspaces){
+            if (workspaces.hasOwnProperty(workspace_id)){
+                var workspace_details=workspaces[workspace_id]; //[name]
+                if(i==0){
+                  addWorkspaceToUI(workspace_id, workspace_details[0], true)
+                }else{
+                  addWorkspaceToUI(workspace_id, workspace_details[0], false)
+                }
+          
+            }
+            i+=1
+          }
+      }
+
+      function getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters, model_recommender){
+        return '\
+        <div class="col-md-12 col-sm-12 col-xs-12">\
+          <div class="col-md-6 col-sm-12 col-xs-12">\
+          <h5> Details</h5>\
+          <b>'+model_recommender+'<b><br>\
+          <p >Train Iters: '+model_train_iters+'\
+          Eval Iters: '+model_eval_iters+'\
+          Save Iters: '+model_save_iters+'\
+          Trained at: '+model_starttime+'</p>\
+          </div>\
+          <div class=" col-md-6 col-sm-12 col-xs-12"><h5>Notes:</h5><span class="col-md-12 col-sm-12 col-xs-12 model-notes">'+model_notes+'</span></div>\
+        </div>\
+        '
+      }
+
+      function getModelsDiv(models, wid){
+          models_div= ""
+          var models = eval(models);
+          console.log("models:",models)
+          for(var model_id in models){
+              if (models.hasOwnProperty(model_id)){
+                  var model_details=models[model_id]; // [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time]
+                  var model_status = model_details[0]
+                  var model_port = model_details[1]
+                  var model_name = model_details[3]
+                  var model_notes = model_details[4]
+                  var model_train_iters = model_details[5]
+                  var model_eval_iters = model_details[6]
+                  var model_save_iters = model_details[7]
+                  var model_starttime = model_details[8]
+                  var model_recommender = model_details[9]
+
+                  var model_file_location = "user/workspace/model/download?mid="+model_id
+                  if (model_status == "TRAINED"){
+                      // show download and deploy options
+                      models_div += ('<div class="col-md-12 col-sm-12 col-xs-12" mid="'+model_id+'">\
+                                        <div class="x_panel">\
+                                          <div class="x_title">\
+                                            <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
+                                            <ul class="nav navbar-right panel_toolbox">\
+                                              <li>\
+                                                  <span class="trained label label-success" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training Completed</span>\
+                                              </li>\
+                                              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
+                                              </li>\
+                                              <li class="dropdown">\
+                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-gear"></i></a>\
+                                                <ul class="dropdown-menu" role="menu">\
+                                                  <li><a href="#">Get Sharing link</a>\
+                                                  </li>\
+                                                  <li><a href="#">Notify on completion <i class="fa fa-check"></i></a>\
+                                                  </li>\
+                                                </ul>\
+                                              </li>\
+                                              <li><a class="close-link"><i dmid="'+model_id+'" class="deleteModel fa fa-trash"></i></a>\
+                                              </li>\
+                                            </ul>\
+                                            <div class="clearfix"></div>\
+                                          </div>\
+                                          <div class="x_content">\
+                                            <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
+                                                '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
+                                                <button type="button" class="btn btn-sm btn-primary">Download model</button>\
+                                                <button type="button" class="btn btn-sm btn-warning">Deploy model</button>\
+                                            </div>\
+                                        </div>\
+                                      </div>\
+                                    </div>')
+                  }else{
+                    // ongoing training
+                    models_div += (getTrainingModelDiv(model_id, wid, model_port))
+                  }
+              }
+          }
+
+          return models_div
+      }
+
+      function getTrainingModelDiv(model_id, wid, model_port){
+        return '\
+        <div class="col-md-12 col-sm-12 col-xs-12" mid="'+model_id+'">\
+                            <div class="x_panel">\
+                              <div class="x_title">\
+                                <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
+                                <ul class="nav navbar-right panel_toolbox">\
+                                  <li>\
+                                      <span class="label label-primary" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training in progress</span>\
+                                  </li>\
+                                  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
+                                  </li>\
+                                  <li class="dropdown">\
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-gear"></i></a>\
+                                    <ul class="dropdown-menu" role="menu">\
+                                      <li><a href="#">Get Sharing link</a>\
+                                      </li>\
+                                      <li><a href="#">Notify on completion <i class="fa fa-check"></i></a>\
+                                      </li>\
+                                    </ul>\
+                                  </li>\
+                                  <li><a class="close-link"><i dmid="'+model_id+'" class="deleteModel fa fa-trash"></i></a>\
+                                  </li>\
+                                </ul>\
+                                <div class="clearfix"></div>\
+                              </div>\
+                              <div class="x_content">\
+                                <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
+                                  <iframe src="http://localhost:'+model_port+'" height="800" width="100%">\
+                                  </iframe>\
+                                  <div class="tiles">\
+                                    <button type="button" class="btn btn-danger">Cancel Training</button>\
+                                    <button type="button" class="btn btn-primary">Download model</button>\
+                                  </div>\
+                                </div>\
+                            </div>\
+                          </div>\
+                        </div>'
+      }
+      
+      function addWorkspaceToUI(workspace_id, workspace_name, to_show){
+          // Add workspace to left nav
+          // create a hidden workspace div
+          // show this workspace div
+          url =workspace_root_url + "/model/list"+"?wid="+workspace_id
+          
+          if (debug){
+              console.log("listing workspace models",url) 
+          }
+          
+
+          $.get(url, function( data ){
+            console.log("data:",data)
+            data = eval(data)
+            console.log("Listed workspace models:",data)
+            models_div = getModelsDiv(data, workspace_id)
+
+            // models_div = getWorkspaceModelsList(workspace_id,getModelsDiv)                        
+            console.log("models_div",models_div)
+            $("#workspaces-nav-ul").append('<li><a nwid="'+workspace_id+'" class="workspaces-nav-li"><i class="fa fa-hashtag"></i>'+workspace_name+'</a></li>')     
+
+            //add single workspace to UI
+            if(to_show == true){
+              highlightWorkspaceNavElement(workspace_id)
+              console.log("showing workspace",workspace_id)
+              $("#cur-workspace-name").text(workspace_name)
+              $("#cur-workspace-name").attr('cur-wid',workspace_id)
+              $("#workspaces-div").prepend('<div wid='+workspace_id+' wname='+workspace_name+'>'+models_div+'</div>')
+              setWorkspaceStats(workspace_id);
+            }else{
+              console.log("hiding workspace",workspace_id)
+              $("#workspaces-div").prepend('<div wid='+workspace_id+' style="display:none"  wname='+workspace_name+'>'+models_div+'</div>')
+            }
+            
+          });
+      }
+
+      function datasetUIOptions(){
+          renameOption = '<i class="fa fa-pencil datasetElOptions"></i>'
+          deleteOption = '<i class="fa fa-trash datasetElOptions"></i>'
+          return renameOption + deleteOption
+      }
+      function addDatasetsToUI(datasets){
+          $("#datasets-div").empty()
+          n = $(datasets).size()
+          if (n == 0){
+              $("#datasets-div").append("No dataset, please upload new")
+          }
+          else{
+              $.each(datasets, function(_, dataset){
+                  $("#datasets-div").append('<div did="'+dataset[0]+'" class="col-md-12 col-sm-12 col-xs-12"><span class="col-md-8 col-sm-8 col-xs-8"><i class="fa fa-file" style="color:#7ec0ee"></i> '+dataset[1]+'</span><span class="col-md-4 col-sm-4 col-xs-4">'+datasetUIOptions()+'</div>')       
+              });
+          }
+      }
+
+      function getTBPort(){
+          // Get port of tensorboard for this model
+          url = workspace_root_url + "/model/port"
+          $.get( url, function( data ) {
+              console.log("retrieved port ..",data['port'])
+              return data["port"]
+          });
+      }
+
+      function getLoadingDiv(model_id, wid){
+        return '\
+          <div class="col-md-12 col-sm-12 col-xs-12" mid="'+model_id+'">\
+            <div class="x_panel">\
+              <div class="x_title">\
+                <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
+                <ul class="nav navbar-right panel_toolbox">\
+                  <li>\
+                      <span class="label label-primary" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training in progress</span>\
+                  </li>\
+                  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
+                  </li>\
+                  <li class="dropdown">\
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-gear"></i></a>\
+                    <ul class="dropdown-menu" role="menu">\
+                      <li><a href="#">Get Sharing link</a>\
+                      </li>\
+                      <li><a href="#">Notify on completion <i class="fa fa-check"></i></a>\
+                      </li>\
+                    </ul>\
+                  </li>\
+                  <li><a class="close-link"><i class="deleteModel fa fa-trash"></i></a>\
+                  </li>\
+                </ul>\
+                <div class="clearfix"></div>\
+              </div>\
+              <div class="x_content">\
+                <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
+                  <center> Loading training details.. <br/> <i class="fa fa-spinner fa-spin"></i></center>\
+                </div>\
+            </div>\
+          </div>\
+        </div>'
+      }
+
+      function resetCreateModelForm(){
+        $("#model-name").val("")
+        $("#model-notes").val("")
+      }
+
+      // Train a model
+      $(document).on('click', '#train-model-btn', function (e) {
+          if (debug){
+              console.log("Training model ...",)
+          }
+          cur_wid = $("span[cur-wid]").attr('cur-wid')  //wid of current workspace
+          workspace_div = $('div[wid='+cur_wid+']') // get div of model from which this train btn was clicked
+          
+          selectedRecommender = $('#recommender-select').find(":selected").text()
+          selectedTrainDatasetId = $('#train-dataset-select').find(':selected').attr('did')
+          selectedTestDatasetId = $('#test-dataset-select').find(':selected').attr('did')
+          
+          //TODO: Evaluator and sampler here, just like dataset
+
+          model_train_iters = $("#train-iters").val()
+          model_save_iters = $("#save-iters").val()
+          model_eval_iters = $("#eval-iters").val()
+
+          model_name = $('#model-name').val()
+          model_notes = $("#model-notes").val()
+
+          console.log("creating model for workspace",cur_wid)
+          
+          $.ajax({
+              url : workspace_root_url+"/model/train",
+              type: "POST",
+              data : JSON.stringify({
+                      csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                      train_dataset: selectedTrainDatasetId,
+                      test_dataset: selectedTestDatasetId,
+                      recommender: selectedRecommender,
+                      workspace_id: cur_wid,
+                      train_iters: model_train_iters,
+                      eval_iters: model_eval_iters,
+                      save_iters: model_save_iters,
+                      name: model_name,
+                      notes: model_notes
+                  }),
+              dataType : "json",
+              success: function( data ){
+                  console.log("training requested ...",data)
+                  port = data['msg']
+                  model_id = data['mid'] //id of newly created model
+                  workspace_div.append(getLoadingDiv(model_id, cur_wid))
+                  setTimeout(function(){
+                      workspace_div.children().last().remove(); //remove loading element
+                      workspace_div.append(getTrainingModelDiv(model_id, cur_wid, port)) 
+                      resetCreateModelForm()
+                  },iframeTimeout);
+                  
+              }
+          });
+      });
+
+        $.ajaxSetup({beforeSend: function(xhr, settings){
+          xhr.setRequestHeader('X-CSRFToken', 
+                               '{{ csrf_token }}');
+        }});
+      
+
+      // Create new workspace
+      $(document).on('click', '#create-workspace-btn', function () {
+          var new_workspace_name = $("#new-workspace-name").val()
+          var new_workspace_desc = $("#new-workspace-desc").val()
+          if (new_workspace_name != ""){
+              if (debug){
+                  console.log("Creating new workspace ...", new_workspace_name)
+              }
+              $.ajax({
+                  url : workspace_root_url+"/create",
+                  type: "POST",
+                  data : JSON.stringify({workspace_name:new_workspace_name}),
+                  dataType : "json",
+                  success: function( new_workspace_details ){
+                      wid = new_workspace_details[0]
+                      name = new_workspace_details[1]
+                      console.log("workspace created ..., updating UI", new_workspace_details)
+                      addWorkspaceToUI(wid, name,true) //show the newly created workspace
+                      $("#new-workspace-name").val("")
+                      $("#new-workspace-desc").val("")
+                      $('#workspace-create-modal-id').modal('toggle');
+                      showWorkspace(wid);
+                  }
+              });
+          }
+      });
+
+      $(document).on('click','.toggleWorkspace',function(e) {
+        if ($(this).hasClass('fa-window-minimize')){
+          $(this).removeClass('fa-window-minimize').addClass('fa-window-maximize')
+        }
+        else{
+          $(this).removeClass('fa-window-maximize').addClass('fa-window-minimize')
+        }
+        $(this).parent().parent().siblings('.workspaceBody').slideToggle()
+      });
+
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      });
+      
+      function getCurrentWid(){
+        // returns wid of current[visible-and-selected] workspace
+        return $("#cur-workspace-name").attr('cur-wid')
+      }
+
+      function setWorkspaceStats(wid){
+        //SET IN UI statistics related to workspace-id == wid
+        wdiv = $('div[wid='+wid+']')
+        wdiv_models_cnt = $(wdiv).children().length;
+        wdiv_completed_models_cnt = 0
+        $.each($("span[pwid="+wid+"]"),function(_,el){
+          if ($(el).hasClass("trained")){
+            wdiv_completed_models_cnt +=1
+          }
+        });
+        wdiv_ongoing_models_cnt = wdiv_models_cnt-wdiv_completed_models_cnt
+        console.log("models_cnt:",wdiv_models_cnt,"wdiv_completed_models_cnt",wdiv_completed_models_cnt)
+
+        setCurrentWorkspaceModelsCnt(wdiv_models_cnt)
+        setCurrentWorkspaceCompletedModelsCnt(wdiv_completed_models_cnt)
+        setCurrentWorkspaceOngoingModelsCnt(wdiv_ongoing_models_cnt)
+      }
+
+      function showWorkspace(wid, cb){
+        // shows workspace with wid=wid
+        // if invalid wid shows first available workspace from nav list
+        if (wid == -1){
+          wid = $("a[nwid]").first().attr('nwid') // first available workspace is selected to show
+        }
+        
+        setWorkspaceStats(wid)
+
+        //show this workspace, hide rest all
+        $.each($("#workspaces-div").children(), function(_,wdiv){
+          if ($(wdiv).attr('wid')==wid){
+            $(wdiv).show(); //show div
+            $("#cur-workspace-name").text($(wdiv).attr('wname')); //set current workspace name
+            $("#cur-workspace-name").attr('cur-wid',wid); // set cur-wid
+          }else{
+            $(wdiv).hide()
+          }
+        });
+        highlightWorkspaceNavElement(wid)
+      }
+
+      function highlightWorkspaceNavElement(wid){
+        wnav_a = $('a[nwid='+wid+']')
+        $(wnav_a).parent().addClass('active')
+        $.each($(wnav_a).parent().siblings(), function(_,psibling){
+          $(psibling).removeClass('active')
+        });
+      }
+
+      $(document).on('click','#delete-workspace-confirm',function(e) {
+          wid = getCurrentWid()
+          $.ajax({
+              url : workspace_root_url+"/delete",
+              type: "DELETE",
+              data : JSON.stringify({wid:wid}),
+              dataType : "json",
+              success: function(data){
+                  alert("Deleting the workspace.."+wid)
+                  $( "div[wid='"+wid+"']").remove(); // delete UI element of deleted workspace
+                  $( "a[nwid='"+wid+"']").parent().remove(); //delete Nav element of deleted workspace
+                  showWorkspace(-1)// show next workspace
+              }
+          });
+      });
+
+      $(document).on('click','.deleteModel',function(e) {
+          mid = $(this).attr('dmid')
+          console.log("trying to del,",mid)
+          $.ajax({
+              url : workspace_root_url+"/model/delete",
+              type: "DELETE",
+              data : JSON.stringify({mid:mid}),
+              dataType : "json",
+              success: function(data){
+                  alert("Deleting the model..")
+                  $( "div[mid='"+mid+"']").remove()
+              }
+          });
+      });
+
+      //workspace selection
+      $(document).on('click','.workspaces-nav-li',function(){
+        wid = $(this).attr('nwid')
+        alert("switching cur workspace to"+wid);
+        showWorkspace(wid); 
+        highlightWorkspaceNavElement(wid);
+      });
+
+      // var 
+      $(window).load(function(){
+          // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
+          getAvailableRecommenders(getDatasetList(getWorkspaceList));
+          var modelStatusCheck = setInterval(function(){
+              model_divs = $("div[mid]")
+              $.each(model_divs, function(_ , md){
+                  mid = $(md).attr('mid')
+                  statusUI = $(md).attr('mstatus')
+                  if (debug){
+                      console.log("checking status for ",mid)    
+                  }
+                  url = workspace_root_url + "/model/status"+"?mid="+mid
+                  $.get( url, function( model_status ) {
+                      if (model_status == "TRAINED" & statusUI != 'TRAINED'){ //bug
+                          $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
+                      }
+                  });    
+              });
+          }, 10000);
+      });
+    </script>
+    <script type="text/javascript">
+        Dropzone.options.myDropzone = {
+            acceptedFiles: ".xls,.csv,.xlsx,.dat",
+            maxFiles:1,
+            addRemoveLinks: true,
+            // Prevents Dropzone from uploading dropped files immediately
+            autoProcessQueue : false,
+            
+            accept: function(file, done) {
+                console.log("uploaded");
+                done();
+            },
+            
+            init: function() {
+
+                myDropzone = this;
+                var submitButton = document.querySelector("#upload-file")
+                
+                submitButton.addEventListener("click", function() {
+                    myDropzone.processQueue();
+                    // Tell Dropzone to process all queued files.
+                });
+
+                this.on("maxfilesexceeded", function(file){
+                    alert("You can upload only one dataset at a time.");
+                    this.removeFile(file)
+                });
+
+                this.on("complete", function (file) {
+                  if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                    // Actions that needed to be done after all uplaods complete
+                    this.removeFile(file)
+                    $(".progress-text").text("All uploads completed")
+                    getDatasetList(); 
+                  }
+                });
+
+            
+            },
+
+            //shows upload progress bar
+            uploadprogress: function(file, progress, bytesSent) {
+                if (file.previewElement) {
+                    progressElement = file.previewElement.querySelector("[data-dz-uploadprogress]");
+                    progressElement.style.width = progress + "%";
+                    $(".progress-text").text(progress + "%")
+                }
+            }
+
+        };
+    </script>	
+  </body>
 </html>
 
-{% endblock content %}
+{% else %}
+  <head>
+    <!-- Yes, we need this separate bootstrap css -->
+    <link href="{{STATIC_URL}}/static/css/bootstrap.css" type="text/css" rel="stylesheet"/>
+    <link href="{{STATIC_URL}}/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}/static/css/board.css" type="text/css" rel="stylesheet"/>
+    <link href="{{STATIC_URL}}/static/css/floating-labels.css" type="text/css" rel="stylesheet"/>
+  </head>
+  
+  <form id="login" class="form-signin" name="LoginForm" action="login" method="post">
+  {% csrf_token %}
+  {% if next %}
+      <input type="hidden" name="next" value="{{ next }}" />
+  {% endif %}
+      <div class="text-center mb-4">
+        <img class="mb-4" src="{{STATIC_URL}}/static/brand/recboard.png" alt="" width="60" height="60">
+        <h1 class="h3 mb-3 font-weight-normal">recboard</h1>
+        <!-- <p>Build form controls with floating labels via the <code>:placeholder-shown</code> pseudo-element. <a href="https://caniuse.com/#feat=css-placeholder-shown">Works in latest Chrome, Safari, and Firefox.</a></p> -->
+      </div>
 
+      <div class="form-label-group">
+        <input type="text" id="username" name="username" class="form-control" placeholder="Email address" required autofocus  action="login" method="post">
+        <label for="username">Username</label>
+      </div>
+
+      <div class="form-label-group">
+        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+        <label for="password">Password</label>
+      </div>
+
+      <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      <p class="mt-5 mb-3 text-muted text-center">&copy; Recboard 2018</p>
+    </form>
+{% endif %}

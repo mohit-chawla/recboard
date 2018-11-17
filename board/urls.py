@@ -19,6 +19,6 @@ urlpatterns = [
     path('user/workspace/create',views.create_workspace,name='index'),
     path('user/workspace/list',views.list_workspaces,name='index'),
     path('user/workspace/model/status', views.get_model_status, name='get_model_status'),
-
+    path('home/user/workspace/model/download',views.download_model)
 
 ]

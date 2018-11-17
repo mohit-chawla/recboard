@@ -30,6 +30,10 @@ class ModelManager:
         self.evaluation_metric = evaluation_metric
         self.path_to_dataset = path_to_dataset
         
+        self.train_iters = train_iters
+        self.eval_iters = eval_iters
+        self.save_iters = save_iters
+
         logging.basicConfig(format=FORMAT)
         self.logger = logging.getLogger(__name__)
 
@@ -205,10 +209,10 @@ class ModelManager:
 
         model_db.status = MODEL_STATUS_TRAINING
         self.db.insert('model',model_db)
-        #TODO do differently for pmf
-        model_trainer.train(total_iter=1000,  # Total number of training iterations
-                            eval_iter=10,    # Evaluate the model every "eval_iter" iterations
-                            save_iter=10,   # Save the model every "save_iter" iterations
+
+        model_trainer.train(total_iter=self.train_iters,  # Total number of training iterations,             1000
+                            eval_iter=self.eval_iters,    # Evaluate the model every "eval_iter" iterations, 10
+                            save_iter=self.save_iters,   # Save the model every "save_iter" iterations,      10
                             train_sampler=train_sampler, 
                             eval_samplers=[val_sampler, test_sampler], 
                             evaluators=[auc_evaluator])
