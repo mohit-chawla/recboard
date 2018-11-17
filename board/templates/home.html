@@ -751,6 +751,7 @@
               highlightWorkspaceNavElement(workspace_id)
               console.log("showing workspace",workspace_id)
               $("#cur-workspace-name").text(workspace_name)
+              $("#workspace-settings-title").text(workspace_name)
               $("#cur-workspace-name").attr('cur-wid',workspace_id)
               $("#workspaces-div").prepend('<div wid='+workspace_id+' wname='+workspace_name+'>'+models_div+'</div>')
               setWorkspaceStats(workspace_id);
@@ -967,6 +968,7 @@
           if ($(wdiv).attr('wid')==wid){
             $(wdiv).show(); //show div
             $("#cur-workspace-name").text($(wdiv).attr('wname')); //set current workspace name
+            $("#workspace-settings-title").text($(wdiv).attr('wname')) // same for settings
             $("#cur-workspace-name").attr('cur-wid',wid); // set cur-wid
           }else{
             $(wdiv).hide()
