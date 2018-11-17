@@ -16,7 +16,7 @@ from .constants import *
 FORMAT = '%(asctime)-15s %(message)s'
 
 class ModelManager:
-    def __init__(self,model_id, db, recommender_name, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
+    def __init__(self,model_id, db, recommender_name, train_iters, eval_iters, save_iters, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
         self.recommender_name = recommender_name
         self.train_sampler = train_sampler
         self.val_sampler = val_sampler
@@ -24,6 +24,10 @@ class ModelManager:
         self.evaluation_metric = evaluation_metric
         self.path_to_dataset = path_to_dataset
         
+        self.train_iters = train_iters
+        self.eval_iters = eval_iters
+        self.save_iters = save_iters
+
         logging.basicConfig(format=FORMAT)
         self.logger = logging.getLogger(__name__)
 
@@ -144,9 +148,9 @@ class ModelManager:
         model_db.status = MODEL_STATUS_TRAINING
         self.db.insert('model',model_db)
 
-        model_trainer.train(total_iter=10,  # Total number of training iterations
-                            eval_iter=10,    # Evaluate the model every "eval_iter" iterations
-                            save_iter=10,   # Save the model every "save_iter" iterations
+        model_trainer.train(total_iter=self.train_iters,  # Total number of training iterations
+                            eval_iter=self.eval_iters,    # Evaluate the model every "eval_iter" iterations
+                            save_iter=self.save_iters,   # Save the model every "save_iter" iterations
                             train_sampler=train_sampler, 
                             eval_samplers=[val_sampler, test_sampler], 
                             evaluators=[auc_evaluator])
