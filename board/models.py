@@ -42,6 +42,11 @@ class Workspace(Document):
 	models = ListField(ObjectIdField())
 	meta = {'collection': 'workspace'}
 	user_id = ObjectIdField()
+	#default settings for workspace
+	default_recommender = StringField(max_length=120)
+	default_train_iters = IntField(min_value=1)
+	default_eval_iters = IntField(min_value=1)
+	default_save_iters = IntField(min_value=1)
 	
 class User(Document):
 	name = StringField(max_length=120, required=True)
