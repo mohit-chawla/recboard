@@ -170,7 +170,7 @@
               <span id="cur-workspace-name">Workspace1</span> 
             </div> 
             <div class="col-md-2 col-sm-2 col-xs-2">
-              <i class=" col-md-2 col-sm-2 col-xs-2 workspace-action fa fa-gears"></i>
+              <i class=" col-md-2 col-sm-2 col-xs-2 workspace-action fa fa-gears" data-toggle="modal" data-target=".workspace-settings-modal"></i>
               <i data-toggle="modal" data-target=".workspace-delete-modal" class=" col-md-2 col-sm-2 col-xs-2 workspace-action fa fa-trash"></i>
             </div>
           </h2>
@@ -192,6 +192,65 @@
               <!-- <span class="count_bottom">ABCD</span> -->
             </div>
           </div>
+          <div class="modal fade workspace-settings-modal" id="workspace-settings-modal-id" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                  </button>
+                  <h4 class="modal-title"> Settings <small>Workspace: <span id="workspace-settings-title"><span></small></h4>
+                </div>
+                <div class="modal-body">
+                  <form id="create-workspace-form" data-parsley-validate class="form-horizontal form-label-left">
+                    <b class="bold">Defaults</b>
+                    <div class="form-group">
+                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Train Iters</label>
+                      <div class="col-md-2 col-sm-8 col-xs-12">
+                        <input type="number" id="default-train-iters" class="form-control col-md-7 col-xs-12">
+                      </div>
+                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Eval Iters</label>
+                      <div class="col-md-2 col-sm-2 col-xs-12">
+                        <input type="number" id="default-eval-iters" class="form-control col-md-7 col-xs-12">
+                      </div>
+                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Save Iters</label>
+                      <div class="col-md-2 col-sm-2 col-xs-12">
+                        <input type="number" id="default-save-iters" class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Recommender</label>
+                      <div class="col-md-2 col-sm-2 col-xs-12">
+                        <select id="default-recommender-select" class="form-control">
+                        </select>
+                      </div>
+                      </div>
+                      <div class="form-group">
+                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Evaluator</label>
+                      <div class="col-md-2 col-sm-2 col-xs-12">
+                        <select id="default-evaluator-select" class="form-control">
+                        </select>
+                      </div>
+                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Sampler</label>
+                      <div class="col-md-2 col-sm-2 col-xs-12">
+                        <select id="default-sampler-select" class="form-control">
+                        </select>
+                      </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                    <b class="bold">Sharing settings</b>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-success" id="save-workspace-settings-btn">Save</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
           <div class="modal fade workspace-create-modal" id="workspace-create-modal-id" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-lg">
               <div class="modal-content">
@@ -532,6 +591,7 @@
                   availableRecommdenders.push(recommender_name)
               });
               $("#recommender-select").append(modelRecommenderOptionsUI());
+              $("#default-recommender-select").append(modelRecommenderOptionsUI());
               $("#recommender-select").change()  // To activate the right hyperparams
               if(cb && typeof cb === "function") {
                   cb();
@@ -752,6 +812,7 @@
               highlightWorkspaceNavElement(workspace_id)
               console.log("showing workspace",workspace_id)
               $("#cur-workspace-name").text(workspace_name)
+              $("#workspace-settings-title").text(workspace_name)
               $("#cur-workspace-name").attr('cur-wid',workspace_id)
               $("#workspaces-div").prepend('<div wid='+workspace_id+' wname='+workspace_name+'>'+models_div+'</div>')
               setWorkspaceStats(workspace_id);
@@ -1045,6 +1106,7 @@
           if ($(wdiv).attr('wid')==wid){
             $(wdiv).show(); //show div
             $("#cur-workspace-name").text($(wdiv).attr('wname')); //set current workspace name
+            $("#workspace-settings-title").text($(wdiv).attr('wname')) // same for settings
             $("#cur-workspace-name").attr('cur-wid',wid); // set cur-wid
           }else{
             $(wdiv).hide()
