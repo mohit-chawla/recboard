@@ -6,8 +6,14 @@ import pickle
 
 from openrec.utils import Dataset
 from openrec.utils.samplers import RandomPairwiseSampler
+from openrec.utils.samplers import RandomPointwiseSampler
 from openrec.utils.samplers import EvaluationSampler
 from openrec.recommenders import BPR
+from openrec.recommenders import PMF
+from openrec.recommenders import UCML
+from openrec.recommenders import VBPR
+from openrec.recommenders import DRR
+from openrec.recommenders import RNNRec
 from openrec.utils.evaluators import AUC
 from openrec import ModelTrainer
 
@@ -17,7 +23,7 @@ FORMAT = '%(asctime)-15s %(message)s'
 
 class ModelManager:
     def __init__(self,model_id, db, recommender_name, train_iters, eval_iters, save_iters, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
-        self.recommender_name = recommender_name
+        self.recommender_name = str(recommender_name).lower()
         self.train_sampler = train_sampler
         self.val_sampler = val_sampler
         self.test_sampler = test_sampler
@@ -33,6 +39,10 @@ class ModelManager:
 
         self.model_id = model_id
         self.db = db
+
+        print("#"*7) # TODO KS convert this to a log
+        print(self.recommender_name, self.train_sampler, self.val_sampler, self.test_sampler, self.evaluation_metric, self.path_to_dataset,)
+        print("#"*7)
 
         self.logger.info("ModelManager init generated model id=", self.model_id)
 
@@ -108,11 +118,14 @@ class ModelManager:
 
         self.logger.info("############ instantiating Samplers.. ############")
 
-        
-
-        train_sampler = RandomPairwiseSampler(batch_size=1000, 
-                                            dataset=train_dataset, 
-                                            num_process=5)
+        if self.recommender_name=="pmf" or self.recommender_name=="drr":
+            train_sampler = RandomPointwiseSampler(batch_size=1000, 
+                                                dataset=train_dataset,
+                                                num_process=5)
+        else:
+            train_sampler = RandomPairwiseSampler(batch_size=1000, 
+                                                dataset=train_dataset, 
+                                                num_process=5)    
         val_sampler = EvaluationSampler(batch_size=1000, 
                                         dataset=val_dataset)
         test_sampler = EvaluationSampler(batch_size=1000, 
@@ -120,16 +133,63 @@ class ModelManager:
 
         self.logger.info("############ instantiating Recommender.. ############")
 
-        
-
-        bpr_model = BPR(batch_size=1000, 
-                        total_users=train_dataset.total_users(), 
-                        total_items=train_dataset.total_items(), 
-                        dim_user_embed=50, 
-                        dim_item_embed=50, 
-                        save_model_dir='data/'+str(self.model_id)+'/', 
-                        train=True, serve=True)
-        print("dataset specs,",train_dataset.total_users(),train_dataset.total_items())
+        model_save_dir = 'data/'+str(self.model_id)+'/'
+        if self.recommender_name=="bpr":
+            print("recommender chosen is:", self.recommender_name)
+            recommender_model = BPR(batch_size=1000, 
+                            total_users=train_dataset.total_users(), 
+                            total_items=train_dataset.total_items(), 
+                            dim_user_embed=50, 
+                            dim_item_embed=50, 
+                            save_model_dir=model_save_dir, 
+                            train=True, serve=True)
+        elif self.recommender_name=="drr":
+            print("recommender chosen is:", self.recommender_name)
+            recommender_model = DRR(batch_size=1000, 
+                            total_users=train_dataset.total_users(), 
+                            total_items=train_dataset.total_items(), 
+                            dim_user_embed=50, 
+                            dim_item_embed=50, 
+                            save_model_dir=model_save_dir, 
+                            train=True, serve=True)
+        elif self.recommender_name=="pmf":
+            print("recommender chosen is:", self.recommender_name)
+            recommender_model = PMF(batch_size=1000, 
+                            total_users=train_dataset.total_users(), 
+                            total_items=train_dataset.total_items(), 
+                            dim_user_embed=50, 
+                            dim_item_embed=50, 
+                            save_model_dir=model_save_dir, 
+                            train=True, serve=True)
+        elif self.recommender_name=="rnnrec":
+            print("recommender chosen is:", self.recommender_name,"BUT STILL USING BPR")
+            print("So sorry! we need you to give us the max_seq_len, num_units as well, so switching to BPR")
+            recommender_model = BPR(batch_size=1000, 
+                            total_users=train_dataset.total_users(), 
+                            total_items=train_dataset.total_items(), 
+                            dim_user_embed=50, 
+                            dim_item_embed=50, 
+                            save_model_dir=model_save_dir, 
+                            train=True, serve=True)
+        elif self.recommender_name=="ucml":
+            print("recommender chosen is:", self.recommender_name)
+            recommender_model = UCML(batch_size=1000, 
+                            total_users=train_dataset.total_users(), 
+                            total_items=train_dataset.total_items(), 
+                            dim_user_embed=50, 
+                            dim_item_embed=50, 
+                            save_model_dir=model_save_dir, 
+                            train=True, serve=True)
+        elif self.recommender_name=="vbpr":
+            print("recommender chosen is:", self.recommender_name,"BUT STILL USING BPR")
+            print("So sorry! we need you to give us the dim_v as well, so switching to BPR")
+            recommender_model = BPR(batch_size=1000, 
+                            total_users=train_dataset.total_users(), 
+                            total_items=train_dataset.total_items(), 
+                            dim_user_embed=50, 
+                            dim_item_embed=50, 
+                            save_model_dir=model_save_dir, 
+                            train=True, serve=True)
 
         self.logger.info("############ instantiating Evaluator.. ############")
         
@@ -140,7 +200,7 @@ class ModelManager:
 
         
 
-        model_trainer = ModelTrainer(model=bpr_model)
+        model_trainer = ModelTrainer(model=recommender_model)
 
         print("############ starting training.. ############")
 
@@ -151,9 +211,9 @@ class ModelManager:
         model_db.status = MODEL_STATUS_TRAINING
         self.db.insert('model',model_db)
 
-        model_trainer.train(total_iter=self.train_iters,  # Total number of training iterations
-                            eval_iter=self.eval_iters,    # Evaluate the model every "eval_iter" iterations
-                            save_iter=self.save_iters,   # Save the model every "save_iter" iterations
+        model_trainer.train(total_iter=self.train_iters,  # Total number of training iterations,             1000
+                            eval_iter=self.eval_iters,    # Evaluate the model every "eval_iter" iterations, 10
+                            save_iter=self.save_iters,   # Save the model every "save_iter" iterations,      10
                             train_sampler=train_sampler, 
                             eval_samplers=[val_sampler, test_sampler], 
                             evaluators=[auc_evaluator])

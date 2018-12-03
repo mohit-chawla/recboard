@@ -342,14 +342,9 @@
                           </div>
                         </div>
                           <div class="form-group">
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Evaluator</label>
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Evaluator (s)</label> 
                           <div class="col-md-3 col-sm-3 col-xs-12">
-                            <select required="required" class="form-control">
-                              <option>Choose option</option>
-                              <option>Option one</option>
-                              <option>Option two</option>
-                              <option>Option three</option>
-                              <option>Option four</option>
+                            <select id="evaluator-select" class="form-control" multiple>
                             </select>
                           </div>
                           <label class="control-label col-md-3 col-sm-3 col-xs-12">Sampler</label>
@@ -370,17 +365,58 @@
                           <div class="form-group">
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Training Iters</label>
                             <div class="col-md-2 col-sm-3col-xs-12">
-                              <input type="number" id="train-iters" value="1000" class="form-control col-md-7 col-xs-12">
+                              <input type="number" id="train-iters" value="100" class="form-control col-md-7 col-xs-12">
                             </div>
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Eval Iters</label>
                             <div class="col-md-2 col-sm-3c ol-xs-12">
-                              <input type="number" id="eval-iters" value="1000" class="form-control col-md-7 col-xs-12">
+                              <input type="number" id="eval-iters" value="10" class="form-control col-md-7 col-xs-12">
                             </div>
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Save Iters</label>
                             <div class="col-md-2 col-sm-3 col-xs-12">
-                              <input type="number" id="save-iters" value="1000" class="form-control col-md-7 col-xs-12">
+                              <input type="number" id="save-iters" value="10" class="form-control col-md-7 col-xs-12">
                             </div>
+                          </div>
+                          <!-- Hyperparams used by all -->
+                          <div class="form-group">
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">batch_size</label>
+                            <div class="col-md-2 col-sm-3col-xs-12">
+                              <input type="number" id="batch-size" value="1000" class="form-control col-md-7 col-xs-12">
+                            </div>
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">total_items</label>
+                            <div class="col-md-2 col-sm-3c ol-xs-12">
+                              <input type="number" id="total-items" value="1000" class="form-control col-md-7 col-xs-12">
+                            </div>
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_item_embed</label>
+                            <div class="col-md-2 col-sm-3 col-xs-12">
+                              <input type="number" id="dim-item-embed" value="50" class="form-control col-md-7 col-xs-12">
+                            </div>
+                          </div>
+                          <!-- Recommender algo-dependent hyperparams -->
+                          <div class="form-group">
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_user_embed</label>
+                            <div class="col-md-2 col-sm-3c ol-xs-12">
+                              <input type="number" id="dim_user_embed" value="50" class="form-control col-md-7 col-xs-12">
+                            </div>
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">total_users</label>
+                            <div class="col-md-2 col-sm-3 col-xs-12">
+                              <input type="number" id="total-users" value="1000" class="form-control col-md-7 col-xs-12">
+                            </div>
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_v</label>
+                            <div class="col-md-2 col-sm-3col-xs-12">
+                              <input type="number" id="dim-v" value="50" class="form-control col-md-7 col-xs-12">
+                            </div>
+                          </div>
 
+                          <!-- Recommender algo-dependent hyperparams #2 -->
+                          <div class="form-group">
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name"> max_seq_len</label>
+                            <div class="col-md-2 col-sm-3c ol-xs-12">
+                              <input type="number" id="max-seq-len" value="1000" class="form-control col-md-7 col-xs-12">
+                            </div>
+                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">num_units</label>
+                            <div class="col-md-2 col-sm-3 col-xs-12">
+                              <input type="number" id="num-units" value="1000" class="form-control col-md-7 col-xs-12">
+                            </div>
                           </div>
                         </div>
                         <div class="ln_solid"></div>
@@ -495,6 +531,7 @@
       debug = true
       var userDatasets = [];
       var availableRecommdenders = [];
+      var availableEvaluators = [];
       var iframeTimeout = 10000
 
       function getWorkspaceList(){
@@ -550,11 +587,28 @@
               console.log("listing available recommenders",url)   
           }
           $.get( url, function( data ) {
-              $.each(data,function( _ , dataset){
-                  availableRecommdenders.push(dataset)
+              $.each(data,function( _ , recommender_name){
+                  availableRecommdenders.push(recommender_name)
               });
               $("#recommender-select").append(modelRecommenderOptionsUI());
               $("#default-recommender-select").append(modelRecommenderOptionsUI());
+              $("#recommender-select").change()  // To activate the right hyperparams
+              if(cb && typeof cb === "function") {
+                  cb();
+              }
+          });
+      }
+
+      function getAvailableEvaluators(cb){
+          url = workspace_root_url + "/evaluator/list"
+          if (debug){
+              console.log("listing available evaluators",url)   
+          }
+          $.get( url, function( data ) {
+              $.each(data,function( _ , evaluator_name){
+                  availableEvaluators.push(evaluator_name)
+              });
+              $("#evaluator-select").append(modelEvaluatorOptionsUI());
               if(cb && typeof cb === "function") {
                   cb();
               }
@@ -573,6 +627,13 @@
           options = ""
           $.each(availableRecommdenders, function(i,recommender){
               options += "<option>"+recommender+"</option>"
+          });
+          return options  
+      }
+      function modelEvaluatorOptionsUI(){
+          options = ""
+          $.each(availableEvaluators, function(i,evaluator){
+              options += "<option>"+evaluator+"</option>"
           });
           return options  
       }
@@ -883,6 +944,39 @@
         $("#model-name").val("")
         $("#model-notes").val("")
       }
+      
+
+      // Add extra fields based on recommender chosen
+      $(document).on('change','#recommender-select',function(){
+        newRecommender = $('#recommender-select').find(":selected").text()
+        dim_user_embed_element = $('#dim_user_embed');
+        dim_v_element = $('#dim-v');
+        total_users_element = $('#total-users');
+        max_seq_len_element = $('#max-seq-len');
+        num_units_element = $('#num-units');
+
+        if (newRecommender === "VBPR") {
+          dim_user_embed_element.removeAttr('disabled');     // Enable 
+          dim_v_element.removeAttr('disabled');              // Enable 
+          total_users_element.removeAttr('disabled');        // Enable 
+          max_seq_len_element.attr('disabled', 'disabled');  // Disable
+          num_units_element.attr('disabled', 'disabled');    // Disable
+        }
+        else if (newRecommender=="RNNRec"){
+          dim_user_embed_element.attr('disabled', 'disabled');     // Disable
+          dim_v_element.attr('disabled', 'disabled');              // Disable
+          total_users_element.attr('disabled', 'disabled');        // Disable
+          max_seq_len_element.removeAttr('disabled');              // Enable
+          num_units_element.removeAttr('disabled');                // Enable
+        }else{ // BPR, PMF, UCML, DRR
+          dim_user_embed_element.removeAttr('disabled'); ;     // Enable
+          dim_v_element.attr('disabled', 'disabled');          // Disable
+          total_users_element.removeAttr('disabled');          // Enable
+          max_seq_len_element.attr('disabled', 'disabled');    // Disable
+          num_units_element.attr('disabled', 'disabled');      // Disable
+        }
+      });
+
 
       // Train a model
       $(document).on('click', '#train-model-btn', function (e) {
@@ -893,24 +987,33 @@
           workspace_div = $('div[wid='+cur_wid+']') // get div of model from which this train btn was clicked
           
           selectedRecommender = $('#recommender-select').find(":selected").text()
+          selectedEvaluators = (function () { 
+                                selected_evals = [];
+                                $("#evaluator-select :selected").each(function(){
+                                    selected_evals.push($(this).text()); 
+                                });
+                                console.log("Found this on collection", selected_evals, typeof(selected_evals))
+                                return selected_evals; 
+                              })(); // $('#evaluator-select').find(":selected").text()
+          console.log("Selected evaluators = ", selectedEvaluators, typeof(selectedEvaluators))
           selectedTrainDatasetId = $('#train-dataset-select').find(':selected').attr('did')
           selectedTestDatasetId = $('#test-dataset-select').find(':selected').attr('did')
           
           //TODO: Evaluator and sampler here, just like dataset
 
-          model_train_iters = $("#train-iters").val()
-          model_save_iters = $("#save-iters").val()
-          model_eval_iters = $("#eval-iters").val()
+          model_train_iters = $("#train-iters").val();
+          model_save_iters = $("#save-iters").val();
+          model_eval_iters = $("#eval-iters").val();
 
-          model_name = $('#model-name').val()
-          model_notes = $("#model-notes").val()
+          model_batch_size = $('#batch_size')
+          model_total_items = $('#total-items')
+          model_dim_item_embed = $('#dim-item-embed')
+
+          model_name = $('#model-name').val();
+          model_notes = $("#model-notes").val();
 
           console.log("creating model for workspace",cur_wid)
-          
-          $.ajax({
-              url : workspace_root_url+"/model/train",
-              type: "POST",
-              data : JSON.stringify({
+          request_dict = {
                       csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
                       train_dataset: selectedTrainDatasetId,
                       test_dataset: selectedTestDatasetId,
@@ -919,9 +1022,44 @@
                       train_iters: model_train_iters,
                       eval_iters: model_eval_iters,
                       save_iters: model_save_iters,
+                      // here
+                      batch_size: model_batch_size,
+                      total_items: model_total_items,
+                      dim_item_embed: model_dim_item_embed,
+
                       name: model_name,
                       notes: model_notes
-                  }),
+                  }
+          dim_user_embed = $('#dim-user-embed');
+          total_users = $("#total-users");
+          dim_v = $("#dim-v");
+          max_seq_len = $("#max-seq-len");
+          num_units = $("#num-units");
+
+          if (!dim_user_embed.attr('disabled')){
+            request_dict.dim_user_embed = dim_user_embed.val()
+          }
+
+          if (!total_users.attr('disabled')){
+            request_dict.total_users = total_users.val()
+          }
+
+          if (!dim_v.attr('disabled')){
+            request_dict.dim_v = dim_v.val()
+          }
+
+          if (!max_seq_len.attr('disabled')){
+            request_dict.max_seq_len = max_seq_len.val()
+          }
+
+          if (!num_units.attr('disabled')){
+            request_dict.num_units = num_units.val()
+          }
+
+          $.ajax({
+              url : workspace_root_url+"/model/train",
+              type: "POST",
+              data : JSON.stringify(request_dict),
               dataType : "json",
               success: function( data ){
                   console.log("training requested ...",data)
@@ -1122,7 +1260,7 @@
       // var 
       $(window).load(function(){
           // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
-          getAvailableRecommenders(getDatasetList(getWorkspaceList));
+          getAvailableEvaluators(getAvailableRecommenders(getDatasetList(getWorkspaceList)));
           // var modelStatusCheck = setInterval(function(){
           //     model_divs = $("div[mid]")
           //     $.each(model_divs, function(_ , md){

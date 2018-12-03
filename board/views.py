@@ -27,6 +27,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from openrec import recommenders
+from openrec.utils import evaluators
 from time import time
 from bson import ObjectId
 from django.utils.encoding import smart_str
@@ -151,6 +152,16 @@ def list_recommenders(request):
         if callable(getattr(recommenders, func)) and func.lower()!="recommender":
             _recs.append(func)
     return JsonResponse(_recs,safe=False)
+
+@login_required(login_url=BOARD_HOME)
+def list_evaluators(request):
+    """List available evaluators with openrec"""
+    # _evals = ["auc", "mse", "ndcg", "precision", "recall"]
+    _evals = []
+    for func in dir(evaluators):
+        if callable(getattr(evaluators, func)) and (func.lower()!="evalmanager" and func.lower()!="evaluator"):
+            _evals.append(func)
+    return JsonResponse(_evals,safe=False)
 
 
 def get_dummy_user():
@@ -342,7 +353,7 @@ class HomePage(TemplateView):
 
 def create(request):
     body = get_request_body(request)
-    _required = ['recommender','train_dataset','test_dataset',"workspace_id","train_iters","eval_iters","save_iters"]
+    _required = ['recommender','train_dataset','test_dataset',"workspace_id","train_iters","eval_iters","save_iters","batch_size","total_items","dim_item_embed"]
     for key in _required:
         if not key in body:
             return HttpResponseBadRequest("Bad request")

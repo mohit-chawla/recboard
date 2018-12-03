@@ -10,6 +10,7 @@ urlpatterns = [
     path('upload', views.upload, name='upload'),
     url(r'^home/$', views.HomePage.as_view(), name='home'),
     path('user/workspace/recommender/list',views.list_recommenders,name='recommenders'),
+    path('user/workspace/evaluator/list',views.list_evaluators,name='evaluators'),
     path('user/workspace/delete',views.delete_workspace,name='delete workspace'),
     path('user/workspace/model/delete',views.delete_model,name='delete model'),
     path('user/workspace/model/train', views.create, name='index'),
