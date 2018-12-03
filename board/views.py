@@ -7,6 +7,7 @@ import os
 from multiprocessing import Process
 
 from .model_manager import ModelManager
+from .deploy_manager import DeployManager
 from .common import exceptions
 from django.views.generic.base import TemplateView
 import logging
@@ -30,11 +31,14 @@ from time import time
 from bson import ObjectId
 from django.utils.encoding import smart_str
 
+
+
 logging.getLogger(__name__)
 
 db = RecboardDB()
 conn = db.connection    
 
+dm = DeployManager()
 
 # def index(request):
 #     return HttpResponse("All good, server is up")
@@ -102,7 +106,7 @@ def list_models(request):
     print("models:",models)
     models_dict = {}
     for model in models:
-        models_dict[str(model.id)] = [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time,model.recommender]
+        models_dict[str(model.id)] = [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time,model.recommender,dm.is_deployed(str(model.id))]
     print("models_dict:",models_dict)
     return JsonResponse(models_dict,safe=False)
 
@@ -257,6 +261,77 @@ def download_model(request):
         response = HttpResponseBadRequest("Model file not found")
 
     return response
+
+def deploy(request):
+    mid = request.GET.get('mid','')
+    if not mid:
+        return HttpResponseBadRequest("Bad request: model id missing") 
+    is_deployed = True
+    if not dm.is_deployed(mid):
+        is_deployed = dm.deploy(mid)
+
+    if not is_deployed:
+        return HttpResponseBadRequest("There was an error in deploying model, pl try again later") 
+
+    model_db = db.get('model',id=ObjectId(mid))
+    model_db.status = "DEPLOYED"
+    db.insert('model',model_db)
+
+    return HttpResponse("Deployed!")
+
+def undeploy(request):
+    mid = request.GET.get('mid','')
+    if not mid:
+        return HttpResponseBadRequest("Bad request: model id missing") 
+    undeployed = True
+    if dm.is_deployed(model_id):
+        undeployed = dm.undeploy(model_id)
+
+    if not undeployed:
+        return HttpResponseBadRequest("There was an error in undeploying model, pl try again later") 
+
+    model_db = db.get('model',id=ObjectId(mid))
+    model_db.status = "TRAINED"
+    db.insert('model',model_db)
+
+    return HttpResponse("UnDeployed!")
+
+def is_deployed(request):
+    mid = request.GET.get('mid','')
+    if not mid:
+        return HttpResponseBadRequest("Bad request: model id missing") 
+
+    return JsonResponse(dm.is_deployed(),safe=False)
+
+
+def predict(request):
+    mid = request.GET.get('mid','')
+    body = get_request_body(request)
+
+    users_arr = request.GET.get('users')
+    items_arr = request.GET.get('items')
+    users_arr = [int(u) for u in users_arr.split(',')]
+    items_arr = items_arr.split(',')
+    print(mid,users_arr, items_arr,type(users_arr))
+    if not mid or not users_arr or not items_arr:
+        return HttpResponseBadRequest("Bad request: model, user or item details missing")
+
+    if len(users_arr)!=len(items_arr):
+        return HttpResponseBadRequest("Bad request: Number of users != Number of items")
+
+    # if not mid or not body or not 'users' in body or not 'items' in body:
+    #     return HttpResponseBadRequest("Bad request")
+
+    # users_arr = body['data']
+    # items_arr = body['items']
+
+    try:
+        predictions = dm.predict(mid, users_arr, items_arr)
+    except Exception as e:
+        return HttpResponseBadRequest("Error in predicting:"+str(e))
+
+    return JsonResponse(predictions, safe=False)
+
 
 
 class HomePage(TemplateView):

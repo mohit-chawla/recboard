@@ -611,7 +611,7 @@
         <div class="col-md-12 col-sm-12 col-xs-12">\
           <div class="col-md-6 col-sm-12 col-xs-12">\
           <h5> Details</h5>\
-          <b>'+model_recommender+'<b><br>\
+          <b>'+model_recommender+'</b><br>\
           <p >Train Iters: '+model_train_iters+'\
           Eval Iters: '+model_eval_iters+'\
           Save Iters: '+model_save_iters+'\
@@ -628,7 +628,7 @@
           console.log("models:",models)
           for(var model_id in models){
               if (models.hasOwnProperty(model_id)){
-                  var model_details=models[model_id]; // [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time]
+                  var model_details=models[model_id]; // [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time,model.recommender]
                   var model_status = model_details[0]
                   var model_port = model_details[1]
                   var model_name = model_details[3]
@@ -670,11 +670,65 @@
                                             <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
                                                 '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
                                                 <button type="button" class="btn btn-sm btn-primary">Download model</button>\
-                                                <button type="button" class="btn btn-sm btn-warning">Deploy model</button>\
+                                                <button type="button" deploy-mid= "'+model_id+'"class=" deploybtn btn btn-sm btn-warning">Deploy model</button>\
                                             </div>\
                                         </div>\
                                       </div>\
                                     </div>')
+                  } else if (model_status == "DEPLOYED"){
+                    models_div += ('<div class="col-md-12 col-sm-12 col-xs-12" mid="'+model_id+'">\
+                                      <div class="x_panel">\
+                                        <div class="x_title">\
+                                          <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
+                                          <ul class="nav navbar-right panel_toolbox">\
+                                            <li>\
+                                                <span class="trained label label-success" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Model Deployed</span>\
+                                            </li>\
+                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
+                                            </li>\
+                                            <li class="dropdown">\
+                                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-gear"></i></a>\
+                                              <ul class="dropdown-menu" role="menu">\
+                                                <li><a href="#">Get Sharing link</a>\
+                                                </li>\
+                                                <li><a href="#">Notify on completion <i class="fa fa-check"></i></a>\
+                                                </li>\
+                                              </ul>\
+                                            </li>\
+                                            <li><a class="close-link"><i dmid="'+model_id+'" class="deleteModel fa fa-trash"></i></a>\
+                                            </li>\
+                                          </ul>\
+                                          <div class="clearfix"></div>\
+                                        </div>\
+                                        <div class="x_content">\
+                                          <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
+                                              '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
+                                              </div>\
+                                              <div class="col-md-12 col-sm-12 col-xs-12">\
+                                                <div class="ln_solid"></div>\
+                                                <p><b>Test API</b> | You can also access model at url: http://localhost:8000/board/user/workspace/model/predict</p>\
+                                                  <div class="col-md-8 col-sm-12 col-s-12">\
+                                                    <div class="form-group">\
+                                                      <label class="control-label col-md-2 col-sm-12 col-xs-12">Users</label>\
+                                                      <div class="col-md-4 col-sm-12 col-xs-12">\
+                                                        <input type="text" class="test-users form-control">\
+                                                      </div>\
+                                                      <label class="control-label col-md-2 col-sm-12 col-xs-12">Items</label>\
+                                                      <div class="col-md-4 col-sm-12 col-xs-12">\
+                                                        <input type="text" class="test-items form-control">\
+                                                      </div>\
+                                                    </div>\
+                                                  </div>\
+                                                  <div class="col-md-4 col-sm-12 col-xs-12">\
+                                                    <button type="button" test-mid="'+model_id+'" class="testBtn btn btn-primary">Test</button>\
+                                                  </div>\
+                                                  <div class="col-md-12 col-sm-12 col-xs-12 test-response-div" resp-mid="'+model_id+'">Response from model will appear here</div>\
+                                              <button type="button" class="btn btn-sm btn-primary">Download model</button>\
+                                              <button type="button" undeploy-mid="'+model_id+'" class="undeployBtn btn btn-sm btn-danger">UnDeploy model</button>\
+                                          </div>\
+                                      </div>\
+                                    </div>\
+                                  </div>')
                   }else{
                     // ongoing training
                     models_div += (getTrainingModelDiv(model_id, wid, model_port))
@@ -884,6 +938,47 @@
           });
       });
 
+      // deploy a model
+      $(document).on('click', '.deploybtn', function (e) {
+          if (debug){
+              console.log("Deploying model model ...",)
+          }
+          moded_to_deploy_id = $(this).attr("deploy-mid")
+          
+          $.ajax({
+              url : workspace_root_url+"/model/deploy?mid="+moded_to_deploy_id,
+              type: "GET",
+              data : JSON.stringify({
+                      csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                  }),
+              dataType : "json",
+              success: function( data ){
+                  console.log("deployment completed ...",moded_to_deploy_id)
+              }
+          });
+      });
+
+      // test a deployed model's API
+      $(document).on('click', '.testBtn', function (e) {
+
+          model_to_test = $(this).attr("test-mid")
+          users = $(this).parent().parent().find(".test-users").first().val()
+          items = $(this).parent().parent().find(".test-items").first().val()
+
+          $.ajax({  
+              url : workspace_root_url+"/model/predict?mid="+model_to_test+"&users="+users+"&items="+items,
+              type: "GET",
+              data : JSON.stringify({
+                      csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                  }),
+              dataType : "json",
+              success: function( data ){
+                $("div[resp-mid="+model_to_test+"]").text(JSON.stringify(data))
+              }
+          });
+      });
+
+
         $.ajaxSetup({beforeSend: function(xhr, settings){
           xhr.setRequestHeader('X-CSRFToken', 
                                '{{ csrf_token }}');
@@ -1028,22 +1123,22 @@
       $(window).load(function(){
           // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
           getAvailableRecommenders(getDatasetList(getWorkspaceList));
-          var modelStatusCheck = setInterval(function(){
-              model_divs = $("div[mid]")
-              $.each(model_divs, function(_ , md){
-                  mid = $(md).attr('mid')
-                  statusUI = $(md).attr('mstatus')
-                  if (debug){
-                      console.log("checking status for ",mid)    
-                  }
-                  url = workspace_root_url + "/model/status"+"?mid="+mid
-                  $.get( url, function( model_status ) {
-                      if (model_status == "TRAINED" & statusUI != 'TRAINED'){ //bug
-                          $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
-                      }
-                  });    
-              });
-          }, 10000);
+          // var modelStatusCheck = setInterval(function(){
+          //     model_divs = $("div[mid]")
+          //     $.each(model_divs, function(_ , md){
+          //         mid = $(md).attr('mid')
+          //         statusUI = $(md).attr('mstatus')
+          //         if (debug){
+          //             console.log("checking status for ",mid)    
+          //         }
+          //         url = workspace_root_url + "/model/status"+"?mid="+mid
+          //         $.get( url, function( model_status ) {
+          //             if (model_status == "TRAINED" & statusUI != 'TRAINED'){ //bug
+          //                 $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
+          //             }
+          //         });    
+          //     });
+          // }, 10000);
       });
     </script>
     <script type="text/javascript">
