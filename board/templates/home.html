@@ -347,25 +347,32 @@
                             <select id="evaluator-select" class="form-control" multiple>
                             </select>
                           </div>
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Sampler</label>
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Train Sampler</label>
                           <div class="col-md-3 col-sm-3 col-xs-12">
-                            <select required="required" class="form-control">
-                              <option>Choose option</option>
-                              <option>Option one</option>
-                              <option>Option two</option>
-                              <option>Option three</option>
-                              <option>Option four</option>
+                            <select id="train-sampler-select" required="required" class="form-control">
                             </select>
                           </div>
                         </div>
-                        
+                        <div class="form-group">
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Val Sampler</label>
+                          <div class="col-md-3 col-sm-3 col-xs-12">
+                            <select id="val-sampler-select" class="form-control">
+                            </select>
+                          </div>
+                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Test Sampler</label>
+                          <div class="col-md-3 col-sm-3 col-xs-12">
+                            <select id="test-sampler-select" class="form-control">
+                            </select>
+                          </div>
+                        </div>
+
                         <div class="ln_solid"></div>
                         <div>
                           <p>Hyperparams</p>
                           <div class="form-group">
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Training Iters</label>
                             <div class="col-md-2 col-sm-3col-xs-12">
-                              <input type="number" id="train-iters" value="1000" class="form-control col-md-7 col-xs-12">
+                              <input type="number" id="train-iters" value="80" class="form-control col-md-7 col-xs-12">
                             </div>
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Eval Iters</label>
                             <div class="col-md-2 col-sm-3c ol-xs-12">
@@ -532,6 +539,7 @@
       var userDatasets = [];
       var availableRecommdenders = [];
       var availableEvaluators = [];
+      var availableSamplers = [];
       var iframeTimeout = 10000
 
       function getWorkspaceList(){
@@ -609,6 +617,26 @@
                   availableEvaluators.push(evaluator_name)
               });
               $("#evaluator-select").append(modelEvaluatorOptionsUI());
+
+              if(cb && typeof cb === "function") {
+                  cb();
+              }
+          });
+      }
+      function getAvailableSamplers(cb){
+          url = workspace_root_url + "/sampler/list"
+          if (debug){
+              console.log("listing available samplers",url)   
+          }
+          $.get( url, function( data ) {
+              $.each(data,function( _ , sampler_name){
+                  availableSamplers.push(sampler_name)
+              });
+              $("#train-sampler-select").append(modelSamplerOptionsUI());
+              $("#val-sampler-select").append(modelSamplerOptionsUI());
+              $("#test-sampler-select").append(modelSamplerOptionsUI());
+              // selected="selected"
+              // for 
               if(cb && typeof cb === "function") {
                   cb();
               }
@@ -633,7 +661,20 @@
       function modelEvaluatorOptionsUI(){
           options = ""
           $.each(availableEvaluators, function(i,evaluator){
-              options += "<option>"+evaluator+"</option>"
+              if (evaluator === "AUC") { // Default evaluator is AUC for any Model
+                options += "<option selected>"+evaluator+"</option>"
+              } else {
+                options += "<option>"+evaluator+"</option>"
+              }
+              
+          });
+          return options  
+      }
+
+      function modelSamplerOptionsUI(){
+          options = ""
+          $.each(availableSamplers, function(i,sampler){
+              options += "<option>"+sampler+"</option>"
           });
           return options  
       }
@@ -936,7 +977,7 @@
           selectedEvaluators = (function () { 
                                 selected_evals = [];
                                 $("#evaluator-select :selected").each(function(){
-                                    selectedValues.push($(this).text()); 
+                                  selected_evals.push($(this).text()); 
                                 });
                                 console.log("Found this on collection", selected_evals, typeof(selected_evals))
                                 return selected_evals; 
@@ -951,12 +992,17 @@
           model_save_iters = $("#save-iters").val();
           model_eval_iters = $("#eval-iters").val();
 
-          model_batch_size = $('#batch_size')
-          model_total_items = $('#total-items')
-          model_dim_item_embed = $('#dim-item-embed')
+          model_batch_size = $('#batch-size').val()
+          model_total_items = $('#total-items').val()
+          model_dim_item_embed = $('#dim-item-embed').val()
+          console.log("model_dim_item_embed ------>", model_dim_item_embed)
 
           model_name = $('#model-name').val();
           model_notes = $("#model-notes").val();
+
+          model_train_sampler = $('#train-sampler-select').val();
+          model_val_sampler = $('#val-sampler-select').val();
+          model_test_sampler = $('#test-sampler-select').val();
 
           console.log("creating model for workspace",cur_wid)
           request_dict = {
@@ -972,6 +1018,12 @@
                       batch_size: model_batch_size,
                       total_items: model_total_items,
                       dim_item_embed: model_dim_item_embed,
+
+                      train_sampler: model_train_sampler,
+                      val_sampler: model_val_sampler,
+                      test_sampler: model_test_sampler,
+
+                      evaluators: selectedEvaluators,
 
                       name: model_name,
                       notes: model_notes
@@ -1165,7 +1217,7 @@
       // var 
       $(window).load(function(){
           // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
-          getAvailableEvaluators(getAvailableRecommenders(getDatasetList(getWorkspaceList)));
+          getAvailableSamplers(getAvailableEvaluators(getAvailableRecommenders(getDatasetList(getWorkspaceList))));
           var modelStatusCheck = setInterval(function(){
               model_divs = $("div[mid]")
               $.each(model_divs, function(_ , md){

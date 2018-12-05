@@ -5,9 +5,14 @@ import logging
 
 
 from openrec.utils import Dataset
+from openrec.utils.samplers import EvaluationSampler
 from openrec.utils.samplers import RandomPairwiseSampler
 from openrec.utils.samplers import RandomPointwiseSampler
-from openrec.utils.samplers import EvaluationSampler
+from openrec.utils.samplers import StratifiedPointwiseSampler
+from openrec.utils.samplers import TemporalEvaluationSampler
+from openrec.utils.samplers import TemporalSampler
+from openrec.utils.samplers import VBPREvaluationSampler
+from openrec.utils.samplers import VBPRPairwiseSampler
 from openrec.recommenders import BPR
 from openrec.recommenders import PMF
 from openrec.recommenders import UCML
@@ -15,6 +20,8 @@ from openrec.recommenders import VBPR
 from openrec.recommenders import DRR
 from openrec.recommenders import RNNRec
 from openrec.utils.evaluators import AUC
+from openrec.utils.evaluators import Precision
+from openrec.utils.evaluators import Recall
 from openrec import ModelTrainer
 
 from .constants import *
@@ -22,12 +29,12 @@ from .constants import *
 FORMAT = '%(asctime)-15s %(message)s'
 
 class ModelManager:
-    def __init__(self,model_id, db, recommender_name, train_iters, eval_iters, save_iters, train_sampler, val_sampler, test_sampler, evaluation_metric, path_to_dataset):
+    def __init__(self,model_id, db, recommender_name, train_iters, eval_iters, save_iters, train_sampler, val_sampler, test_sampler, evaluation_metrics, path_to_dataset):
         self.recommender_name = str(recommender_name).lower()
         self.train_sampler = train_sampler
         self.val_sampler = val_sampler
         self.test_sampler = test_sampler
-        self.evaluation_metric = evaluation_metric
+        self.evaluation_metrics = evaluation_metrics # is a list of evaluators
         self.path_to_dataset = path_to_dataset
         
         self.train_iters = train_iters
@@ -41,7 +48,7 @@ class ModelManager:
         self.db = db
 
         print("#"*7) # TODO KS convert this to a log
-        print(self.recommender_name, self.train_sampler, self.val_sampler, self.test_sampler, self.evaluation_metric, self.path_to_dataset,)
+        print(self.recommender_name, self.train_sampler, self.val_sampler, self.test_sampler, self.evaluation_metrics, self.path_to_dataset,)
         print("#"*7)
 
         self.logger.info("ModelManager init generated model id=", self.model_id)
@@ -115,18 +122,40 @@ class ModelManager:
 
         self.logger.info("############ instantiating Samplers.. ############")
 
-        if self.recommender_name=="pmf" or self.recommender_name=="drr":
+        # if self.recommender_name=="pmf" or self.recommender_name=="drr":
+        #     train_sampler = RandomPointwiseSampler(batch_size=1000, 
+        #                                         dataset=train_dataset,
+        #                                         num_process=5)
+        # else:
+        #     train_sampler = RandomPairwiseSampler(batch_size=1000, 
+        #                                         dataset=train_dataset, 
+        #                                         num_process=5) 
+        print("[train_sampler] Currently expecting RandomPointwiseSampler for pmf/drr and RandomPairwiseSampler otherwise")   
+        if self.train_sampler == "RandomPointwiseSampler" and (self.recommender_name=="pmf" or self.recommender_name=="drr"):
             train_sampler = RandomPointwiseSampler(batch_size=1000, 
                                                 dataset=train_dataset,
                                                 num_process=5)
         else:
+            if self.train_sampler != "RandomPairwiseSampler":
+                print("[train_sampler] You requested",self.train_sampler,", but currently defaulting to RandomPairwiseSampler")
             train_sampler = RandomPairwiseSampler(batch_size=1000, 
                                                 dataset=train_dataset, 
-                                                num_process=5)    
-        val_sampler = EvaluationSampler(batch_size=1000, 
-                                        dataset=val_dataset)
-        test_sampler = EvaluationSampler(batch_size=1000, 
-                                        dataset=test_dataset)
+                                                num_process=5) 
+        
+        if self.val_sampler == "EvaluationSampler":
+            val_sampler = EvaluationSampler(batch_size=1000, 
+                                            dataset=val_dataset)
+        else:    
+            print("[val_sampler] You requested",self.val_sampler,", but currently defaulting to EvaluationSampler")   
+            val_sampler = EvaluationSampler(batch_size=1000, 
+                                            dataset=val_dataset)
+        if self.test_sampler == "EvaluationSampler":
+            test_sampler = EvaluationSampler(batch_size=1000, 
+                                            dataset=test_dataset)
+        else:    
+            print("[test_sampler] You requested",self.test_sampler,", but currently defaulting to EvaluationSampler")   
+            test_sampler = EvaluationSampler(batch_size=1000, 
+                                            dataset=test_dataset)
 
         self.logger.info("############ instantiating Recommender.. ############")
 
@@ -190,10 +219,22 @@ class ModelManager:
                             train=True, serve=True)
 
 
-        self.logger.info("############ instantiating Evaluator.. ############")
+        self.logger.info("############ instantiating Evaluators.. ############")
         
-
-        auc_evaluator = AUC()
+        evaluator_objs_list = [] 
+        for evaluator_name in self.evaluation_metrics:
+            if evaluator_name == "AUC":
+                auc_evaluator = AUC()
+                evaluator_objs_list.append( auc_evaluator )
+            elif evaluator_name == "Precision":
+                prec_evaluator = Precision(precision_at=[5])  # TODO KS: Allow user to select this hyperparameter
+                evaluator_objs_list.append( prec_evaluator )
+            elif evaluator_name == "Recall":
+                recall_evaluator = Recall(recall_at=[5]) # TODO KS: Allow user to select this hyperparameter
+                evaluator_objs_list.append( recall_evaluator )
+            else:
+                print("You requested the evaluator", evaluator_name, "Which we dont yet support... \n Try using AUC/Precision/Recall")
+                
 
         self.logger.info("############ instantiating Model trainer.. ############")
 
@@ -215,7 +256,7 @@ class ModelManager:
                             save_iter=self.save_iters,   # Save the model every "save_iter" iterations,      10
                             train_sampler=train_sampler, 
                             eval_samplers=[val_sampler, test_sampler], 
-                            evaluators=[auc_evaluator])
+                            evaluators=evaluator_objs_list)
         # self.logger.info("THIS IS WHEN MODEL WILL START TRAINING... returning")
         self.logger.info("-------- sample_data_and_train ends --------")
 
