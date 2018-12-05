@@ -683,6 +683,36 @@
         '
       }
 
+      function getDeployedModelTestingUI(model_id ,cb){
+        content =  '<div class="ln_solid"></div>\
+                <p><b>Test API</b> | You can also access model at url: http://localhost:8000/board/user/workspace/model/predict</p>\
+                <div class="col-md-8 col-sm-12 col-s-12">\
+                  <div class="form-group">\
+                    <label class="control-label col-md-2 col-sm-12 col-xs-12">Users</label>\
+                    <div class="col-md-4 col-sm-12 col-xs-12">\
+                      <input type="text" class="test-users form-control">\
+                    </div>\
+                    <label class="control-label col-md-2 col-sm-12 col-xs-12">Items</label>\
+                    <div class="col-md-4 col-sm-12 col-xs-12">\
+                      <input type="text" class="test-items form-control">\
+                    </div>\
+                  </div>\
+                </div>\
+                <div class="col-md-4 col-sm-12 col-xs-12">\
+                  <button type="button" test-mid="'+model_id+'" class="testBtn btn btn-primary">Test</button>\
+                </div>\
+                <div class="col-md-12 col-sm-12 col-xs-12 test-response-div" resp-mid="'+model_id+'">\
+                  Response from model will appear here\
+                </div>\
+                '
+          if(cb && typeof cb === "function") {
+            cb(content)
+          } else{
+            return content
+          }
+
+      }
+
       function getModelsDiv(models, wid){
           models_div= ""
           var models = eval(models);
@@ -709,7 +739,7 @@
                                             <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
                                             <ul class="nav navbar-right panel_toolbox">\
                                               <li>\
-                                                  <span class="trained label label-success" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training Completed</span>\
+                                                '+getModelLabel(model_id, wid, "TRAINED")+'\
                                               </li>\
                                               <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
                                               </li>\
@@ -730,6 +760,8 @@
                                           <div class="x_content">\
                                             <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
                                                 '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
+                                                  <span class="model-testing-span">\
+                                                  </span>\
                                                 <button type="button" class="btn btn-sm btn-primary">Download model</button>\
                                                 <button type="button" deploy-mid= "'+model_id+'"class=" deploybtn btn btn-sm btn-warning">Deploy model</button>\
                                             </div>\
@@ -743,7 +775,7 @@
                                           <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
                                           <ul class="nav navbar-right panel_toolbox">\
                                             <li>\
-                                                <span class="trained label label-success" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Model Deployed</span>\
+                                                '+getModelLabel(model_id, wid, "DEPLOYED")+'\
                                             </li>\
                                             <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
                                             </li>\
@@ -764,26 +796,10 @@
                                         <div class="x_content">\
                                           <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
                                               '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
-                                              </div>\
                                               <div class="col-md-12 col-sm-12 col-xs-12">\
-                                                <div class="ln_solid"></div>\
-                                                <p><b>Test API</b> | You can also access model at url: http://localhost:8000/board/user/workspace/model/predict</p>\
-                                                  <div class="col-md-8 col-sm-12 col-s-12">\
-                                                    <div class="form-group">\
-                                                      <label class="control-label col-md-2 col-sm-12 col-xs-12">Users</label>\
-                                                      <div class="col-md-4 col-sm-12 col-xs-12">\
-                                                        <input type="text" class="test-users form-control">\
-                                                      </div>\
-                                                      <label class="control-label col-md-2 col-sm-12 col-xs-12">Items</label>\
-                                                      <div class="col-md-4 col-sm-12 col-xs-12">\
-                                                        <input type="text" class="test-items form-control">\
-                                                      </div>\
-                                                    </div>\
-                                                  </div>\
-                                                  <div class="col-md-4 col-sm-12 col-xs-12">\
-                                                    <button type="button" test-mid="'+model_id+'" class="testBtn btn btn-primary">Test</button>\
-                                                  </div>\
-                                                  <div class="col-md-12 col-sm-12 col-xs-12 test-response-div" resp-mid="'+model_id+'">Response from model will appear here</div>\
+                                                <span class="model-testing-span">\
+                                                '+getDeployedModelTestingUI(model_id)+'\
+                                                </span>\
                                               <button type="button" class="btn btn-sm btn-primary">Download model</button>\
                                               <button type="button" undeploy-mid="'+model_id+'" class="undeployBtn btn btn-sm btn-danger">UnDeploy model</button>\
                                           </div>\
@@ -800,6 +816,17 @@
           return models_div
       }
 
+      function getModelLabel( model_id, wid, label_type){
+        if (label_type == "DEPLOYED"){
+          return '<span class="trained label label-warning blinker" label-mid="'+model_id+'" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom; border:1px solid transparent;">Model Deployed</span>'
+        }else if (label_type == "TRAINED"){
+          return '<span class="trained label label-success" label-mid="'+model_id+'" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training Completed</span>'
+        }else{ //TRAINING IN PROGRESS
+          return ''
+        }
+
+      }
+
       function getTrainingModelDiv(model_id, wid, model_port){
         return '\
         <div class="col-md-12 col-sm-12 col-xs-12" mid="'+model_id+'">\
@@ -808,7 +835,7 @@
                                 <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
                                 <ul class="nav navbar-right panel_toolbox">\
                                   <li>\
-                                      <span class="label label-primary" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training in progress</span>\
+                                      <span class="label label-primary" pwid="'+wid+'" label-mid="'+model_id+'" style="color:#FFF;vertical-align: bottom;">Training in progress</span>\
                                   </li>\
                                   <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
                                   </li>\
@@ -1081,20 +1108,49 @@
           if (debug){
               console.log("Deploying model model ...",)
           }
-          moded_to_deploy_id = $(this).attr("deploy-mid")
+          var model_to_deploy_id = $(this).attr("deploy-mid")
+          var e = this  
           
           $.ajax({
-              url : workspace_root_url+"/model/deploy?mid="+moded_to_deploy_id,
+              url : workspace_root_url+"/model/deploy?mid="+model_to_deploy_id,
               type: "GET",
               data : JSON.stringify({
                       csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
                   }),
               dataType : "json",
               success: function( data ){
-                  console.log("deployment completed ...",moded_to_deploy_id)
+                  console.log("deployment completed ...",model_to_deploy_id)
+                  getDeployedModelTestingUI(model_to_deploy_id, function(content){$(e).parent().children(".model-testing-span").html(content);})
+                  //Replace deploy button with undeploy btn
+                  $(e).replaceWith('<button type="button" undeploy-mid="'+model_to_deploy_id+'" class="undeployBtn btn btn-sm btn-danger">UnDeploy model</button>')
+                  parent_wid = $("span[label-mid="+model_to_deploy_id+"]").attr("pwid")
+                  $("span[label-mid="+model_to_deploy_id+"]").replaceWith(getModelLabel(model_to_deploy_id, parent_wid, "DEPLOYED"))
               }
           });
       });
+
+      // deploy a model
+      $(document).on('click', '.undeployBtn', function (e) {
+        var model_id = $(this).attr("undeploy-mid")
+        var e = this
+        $.ajax({
+            url : workspace_root_url+"/model/undeploy?mid="+model_id,
+            type: "GET",
+            data : JSON.stringify({
+                    csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                }),
+            dataType : "json",
+            success: function( data ){
+                console.log("model undeployed completed ...",model_id)
+                $(e).parent().children('.model-testing-span').html("")
+                $(e).replaceWith('<button type="button" deploy-mid= "'+model_id+'"class=" deploybtn btn btn-sm btn-warning">Deploy model</button>')
+                parent_wid = $("span[label-mid="+model_id+"]").attr("pwid")
+                $("span[label-mid="+model_id+"]").replaceWith(getModelLabel(model_id, parent_wid, "TRAINED"))
+            }
+        });
+      });
+
+
 
       // test a deployed model's API
       $(document).on('click', '.testBtn', function (e) {

@@ -288,15 +288,15 @@ def deploy(request):
     model_db.status = "DEPLOYED"
     db.insert('model',model_db)
 
-    return HttpResponse("Deployed!")
+    return JsonResponse("Deployed!",safe=False)
 
 def undeploy(request):
     mid = request.GET.get('mid','')
     if not mid:
         return HttpResponseBadRequest("Bad request: model id missing") 
     undeployed = True
-    if dm.is_deployed(model_id):
-        undeployed = dm.undeploy(model_id)
+    if dm.is_deployed(mid):
+        undeployed = dm.undeploy(mid)
 
     if not undeployed:
         return HttpResponseBadRequest("There was an error in undeploying model, pl try again later") 
@@ -305,7 +305,7 @@ def undeploy(request):
     model_db.status = "TRAINED"
     db.insert('model',model_db)
 
-    return HttpResponse("UnDeployed!")
+    return JsonResponse("UnDeployed!",safe=False)
 
 def is_deployed(request):
     mid = request.GET.get('mid','')

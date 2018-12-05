@@ -88,6 +88,17 @@ class DeployManager():
 				
 		return True
 
+	def undeploy(self, model_id):
+		"""Deploys a model with id:model_id"""
+		assert(type(model_id)==str)
+
+		if model_id in self.model_objects:
+			del self.model_objects[model_id]
+			del self.model_maps[model_id]
+			del self.model_details[model_id]
+			
+		return True
+
 	def is_deployed(self, model_id):
 		"""Check if a model is deployed"""
 		assert(type(model_id)==str)
