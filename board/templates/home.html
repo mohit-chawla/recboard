@@ -22,6 +22,10 @@
     <!-- Custom Theme Style -->
     <link href="{{STATIC_URL}}/static/build/css/custom.min.css" rel="stylesheet">
     <link href="{{STATIC_URL}}/static/css/board.css" rel="stylesheet">
+    <!-- PNotify -->
+    <link href="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -522,6 +526,10 @@
     <!-- Custom Theme Scripts -->
     <script src="{{STATIC_URL}}/static/build/js/custom.min.js"></script>
     <script src="{{STATIC_URL}}/static/js/dropzone.js"></script>
+    <!-- PNotify -->
+    <script src="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.js"></script>
+    <script src="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.buttons.js"></script>
+    <script src="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.nonblock.js"></script>
     <script type="text/javascript">
       
       var hostname = window.location.origin
@@ -803,6 +811,7 @@
                                               <button type="button" class="btn btn-sm btn-primary">Download model</button>\
                                               <button type="button" undeploy-mid="'+model_id+'" class="undeployBtn btn btn-sm btn-danger">UnDeploy model</button>\
                                           </div>\
+                                        </div>\
                                       </div>\
                                     </div>\
                                   </div>')
@@ -1007,6 +1016,15 @@
 
       // Train a model
       $(document).on('click', '#train-model-btn', function (e) {
+          
+          new PNotify({
+            title: 'Training Started!',
+            text: 'Model Training has started, see model box below!',
+            type: 'success',
+            styling: 'bootstrap3',
+            addclass: 'dark'
+          });
+
           if (debug){
               console.log("Training model ...",)
           }
@@ -1105,6 +1123,7 @@
 
       // deploy a model
       $(document).on('click', '.deploybtn', function (e) {
+
           if (debug){
               console.log("Deploying model model ...",)
           }
@@ -1125,6 +1144,13 @@
                   $(e).replaceWith('<button type="button" undeploy-mid="'+model_to_deploy_id+'" class="undeployBtn btn btn-sm btn-danger">UnDeploy model</button>')
                   parent_wid = $("span[label-mid="+model_to_deploy_id+"]").attr("pwid")
                   $("span[label-mid="+model_to_deploy_id+"]").replaceWith(getModelLabel(model_to_deploy_id, parent_wid, "DEPLOYED"))
+
+                  new PNotify({
+                    title: 'Model Deployed',
+                    text: 'Your model was deployed successfully, see model box for details!',
+                    type: 'warning',
+                    styling: 'bootstrap3',
+                  });
               }
           });
       });
@@ -1146,6 +1172,13 @@
                 $(e).replaceWith('<button type="button" deploy-mid= "'+model_id+'"class=" deploybtn btn btn-sm btn-warning">Deploy model</button>')
                 parent_wid = $("span[label-mid="+model_id+"]").attr("pwid")
                 $("span[label-mid="+model_id+"]").replaceWith(getModelLabel(model_id, parent_wid, "TRAINED"))
+
+                new PNotify({
+                  title: 'Model UnDeployed',
+                  text: 'You model was deployed successfully, see model box for details!',
+                  type: 'success',
+                  styling: 'bootstrap3',
+                });
             }
         });
       });
@@ -1301,6 +1334,14 @@
               success: function(data){
                   alert("Deleting the model..")
                   $( "div[mid='"+mid+"']").remove()
+
+                  new PNotify({
+                    title: 'Model Deleted',
+                    text: 'Your model '+mid+' was deleted successfully!',
+                    type: 'info',
+                    styling: 'bootstrap3',
+                    addClass: 'dark',
+                  });
               }
           });
       });
