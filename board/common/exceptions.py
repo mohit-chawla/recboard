@@ -7,3 +7,6 @@ class InvalidCollectionName(Exception):
 
 class InvalidArgumentException(Exception):
 	pass
+
+class InvalidItemException(Exception):
+	pass

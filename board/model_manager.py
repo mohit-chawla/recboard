@@ -2,7 +2,7 @@ import numpy as np
 import random
 import os
 import logging
-
+import pickle
 
 from openrec.utils import Dataset
 from openrec.utils.samplers import RandomPairwiseSampler
@@ -58,7 +58,7 @@ class ModelManager:
                 interactions_count += int(line.split()[0])
                 total_users += 1
         self.logger.info('############ collecting data.. ############')
-
+        print("users: ",total_users,"interactions_count:", interactions_count)
         # radomly hold out an item per user for validation and testing respectively.
         val_structured_arr = np.zeros(total_users, dtype=[('user_id', np.int32), 
                                                         ('item_id', np.int32)]) 
@@ -92,7 +92,10 @@ class ModelManager:
                                                                 map_to_item_id[item])
                         interaction_ind += 1
                 next_user_id += 1
-
+        model_dir = os.path.dirname(os.path.abspath(__file__))+"/data/"+str(self.model_id)
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+        pickle.dump( map_to_item_id, open(model_dir+"/"+str(self.model_id)+"_pickle", "wb" ) )
 
         self.logger.info('############ instantiating dataset.. ############')
 
@@ -130,8 +133,7 @@ class ModelManager:
 
         self.logger.info("############ instantiating Recommender.. ############")
 
-        
-        model_save_dir = self.recommender_name+'_recommender/'
+        model_save_dir = 'data/'+str(self.model_id)+'/'
         if self.recommender_name=="bpr":
             print("recommender chosen is:", self.recommender_name)
             recommender_model = BPR(batch_size=1000, 
@@ -188,7 +190,6 @@ class ModelManager:
                             dim_item_embed=50, 
                             save_model_dir=model_save_dir, 
                             train=True, serve=True)
-
 
         self.logger.info("############ instantiating Evaluator.. ############")
         

@@ -20,6 +20,9 @@ urlpatterns = [
     path('user/workspace/create',views.create_workspace,name='index'),
     path('user/workspace/list',views.list_workspaces,name='index'),
     path('user/workspace/model/status', views.get_model_status, name='get_model_status'),
-    path('home/user/workspace/model/download',views.download_model)
-
+    path('home/user/workspace/model/download',views.download_model),
+    path('user/workspace/model/predict',views.predict, name='predict'),
+    path('user/workspace/model/deploy',views.deploy, name="deploy_model"),
+    path('user/workspace/model/undeploy',views.undeploy, name="undeploy_model"),
+    path('user/workspace/model/deploy/check',views.is_deployed, name="check_deploy_model")
 ]
