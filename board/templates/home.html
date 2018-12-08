@@ -22,6 +22,10 @@
     <!-- Custom Theme Style -->
     <link href="{{STATIC_URL}}/static/build/css/custom.min.css" rel="stylesheet">
     <link href="{{STATIC_URL}}/static/css/board.css" rel="stylesheet">
+    <!-- PNotify -->
+    <link href="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -372,7 +376,7 @@
                           <div class="form-group">
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Training Iters</label>
                             <div class="col-md-2 col-sm-3col-xs-12">
-                              <input type="number" id="train-iters" value="80" class="form-control col-md-7 col-xs-12">
+                              <input type="number" id="train-iters" value="100" class="form-control col-md-7 col-xs-12">
                             </div>
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Eval Iters</label>
                             <div class="col-md-2 col-sm-3c ol-xs-12">
@@ -395,14 +399,14 @@
                             </div>
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_item_embed</label>
                             <div class="col-md-2 col-sm-3 col-xs-12">
-                              <input type="number" id="dim-item-embed" value="1000" class="form-control col-md-7 col-xs-12">
+                              <input type="number" id="dim-item-embed" value="50" class="form-control col-md-7 col-xs-12">
                             </div>
                           </div>
                           <!-- Recommender algo-dependent hyperparams -->
                           <div class="form-group">
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_user_embed</label>
                             <div class="col-md-2 col-sm-3c ol-xs-12">
-                              <input type="number" id="dim_user_embed" value="1000" class="form-control col-md-7 col-xs-12">
+                              <input type="number" id="dim_user_embed" value="50" class="form-control col-md-7 col-xs-12">
                             </div>
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">total_users</label>
                             <div class="col-md-2 col-sm-3 col-xs-12">
@@ -410,7 +414,7 @@
                             </div>
                             <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_v</label>
                             <div class="col-md-2 col-sm-3col-xs-12">
-                              <input type="number" id="dim-v" value="1000" class="form-control col-md-7 col-xs-12">
+                              <input type="number" id="dim-v" value="50" class="form-control col-md-7 col-xs-12">
                             </div>
                           </div>
 
@@ -529,6 +533,10 @@
     <!-- Custom Theme Scripts -->
     <script src="{{STATIC_URL}}/static/build/js/custom.min.js"></script>
     <script src="{{STATIC_URL}}/static/js/dropzone.js"></script>
+    <!-- PNotify -->
+    <script src="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.js"></script>
+    <script src="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.buttons.js"></script>
+    <script src="{{STATIC_URL}}/static/vendors/pnotify/dist/pnotify.nonblock.js"></script>
     <script type="text/javascript">
       
       var hostname = window.location.origin
@@ -713,7 +721,7 @@
         <div class="col-md-12 col-sm-12 col-xs-12">\
           <div class="col-md-6 col-sm-12 col-xs-12">\
           <h5> Details</h5>\
-          <b>'+model_recommender+'<b><br>\
+          <b>'+model_recommender+'</b><br>\
           <p >Train Iters: '+model_train_iters+'\
           Eval Iters: '+model_eval_iters+'\
           Save Iters: '+model_save_iters+'\
@@ -724,13 +732,43 @@
         '
       }
 
+      function getDeployedModelTestingUI(model_id ,cb){
+        content =  '<div class="ln_solid"></div>\
+                <p><b>Test API</b> | You can also access model at url: http://localhost:8000/board/user/workspace/model/predict</p>\
+                <div class="col-md-8 col-sm-12 col-s-12">\
+                  <div class="form-group">\
+                    <label class="control-label col-md-2 col-sm-12 col-xs-12">Users</label>\
+                    <div class="col-md-4 col-sm-12 col-xs-12">\
+                      <input type="text" class="test-users form-control">\
+                    </div>\
+                    <label class="control-label col-md-2 col-sm-12 col-xs-12">Items</label>\
+                    <div class="col-md-4 col-sm-12 col-xs-12">\
+                      <input type="text" class="test-items form-control">\
+                    </div>\
+                  </div>\
+                </div>\
+                <div class="col-md-4 col-sm-12 col-xs-12">\
+                  <button type="button" test-mid="'+model_id+'" class="testBtn btn btn-primary">Test</button>\
+                </div>\
+                <div class="col-md-12 col-sm-12 col-xs-12 test-response-div" resp-mid="'+model_id+'">\
+                  Response from model will appear here\
+                </div>\
+                '
+          if(cb && typeof cb === "function") {
+            cb(content)
+          } else{
+            return content
+          }
+
+      }
+
       function getModelsDiv(models, wid){
           models_div= ""
           var models = eval(models);
           console.log("models:",models)
           for(var model_id in models){
               if (models.hasOwnProperty(model_id)){
-                  var model_details=models[model_id]; // [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time]
+                  var model_details=models[model_id]; // [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time,model.recommender]
                   var model_status = model_details[0]
                   var model_port = model_details[1]
                   var model_name = model_details[3]
@@ -750,7 +788,7 @@
                                             <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
                                             <ul class="nav navbar-right panel_toolbox">\
                                               <li>\
-                                                  <span class="trained label label-success" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training Completed</span>\
+                                                '+getModelLabel(model_id, wid, "TRAINED")+'\
                                               </li>\
                                               <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
                                               </li>\
@@ -771,12 +809,53 @@
                                           <div class="x_content">\
                                             <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
                                                 '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
+                                                  <span class="model-testing-span">\
+                                                  </span>\
                                                 <button type="button" class="btn btn-sm btn-primary">Download model</button>\
-                                                <button type="button" class="btn btn-sm btn-warning">Deploy model</button>\
+                                                <button type="button" deploy-mid= "'+model_id+'"class=" deploybtn btn btn-sm btn-warning">Deploy model</button>\
                                             </div>\
                                         </div>\
                                       </div>\
                                     </div>')
+                  } else if (model_status == "DEPLOYED"){
+                    models_div += ('<div class="col-md-12 col-sm-12 col-xs-12" mid="'+model_id+'">\
+                                      <div class="x_panel">\
+                                        <div class="x_title">\
+                                          <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
+                                          <ul class="nav navbar-right panel_toolbox">\
+                                            <li>\
+                                                '+getModelLabel(model_id, wid, "DEPLOYED")+'\
+                                            </li>\
+                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
+                                            </li>\
+                                            <li class="dropdown">\
+                                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-gear"></i></a>\
+                                              <ul class="dropdown-menu" role="menu">\
+                                                <li><a href="#">Get Sharing link</a>\
+                                                </li>\
+                                                <li><a href="#">Notify on completion <i class="fa fa-check"></i></a>\
+                                                </li>\
+                                              </ul>\
+                                            </li>\
+                                            <li><a class="close-link"><i dmid="'+model_id+'" class="deleteModel fa fa-trash"></i></a>\
+                                            </li>\
+                                          </ul>\
+                                          <div class="clearfix"></div>\
+                                        </div>\
+                                        <div class="x_content">\
+                                          <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
+                                              '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
+                                              <div class="col-md-12 col-sm-12 col-xs-12">\
+                                                <span class="model-testing-span">\
+                                                '+getDeployedModelTestingUI(model_id)+'\
+                                                </span>\
+                                              <button type="button" class="btn btn-sm btn-primary">Download model</button>\
+                                              <button type="button" undeploy-mid="'+model_id+'" class="undeployBtn btn btn-sm btn-danger">UnDeploy model</button>\
+                                          </div>\
+                                        </div>\
+                                      </div>\
+                                    </div>\
+                                  </div>')
                   }else{
                     // ongoing training
                     models_div += (getTrainingModelDiv(model_id, wid, model_port))
@@ -787,6 +866,17 @@
           return models_div
       }
 
+      function getModelLabel( model_id, wid, label_type){
+        if (label_type == "DEPLOYED"){
+          return '<span class="trained label label-warning blinker" label-mid="'+model_id+'" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom; border:1px solid transparent;">Model Deployed</span>'
+        }else if (label_type == "TRAINED"){
+          return '<span class="trained label label-success" label-mid="'+model_id+'" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training Completed</span>'
+        }else{ //TRAINING IN PROGRESS
+          return ''
+        }
+
+      }
+
       function getTrainingModelDiv(model_id, wid, model_port){
         return '\
         <div class="col-md-12 col-sm-12 col-xs-12" mid="'+model_id+'">\
@@ -795,7 +885,7 @@
                                 <h2>Model: '+model_id+' <small>model description/tags</small></h2>\
                                 <ul class="nav navbar-right panel_toolbox">\
                                   <li>\
-                                      <span class="label label-primary" pwid="'+wid+'" style="color:#FFF;vertical-align: bottom;">Training in progress</span>\
+                                      <span class="label label-primary" pwid="'+wid+'" label-mid="'+model_id+'" style="color:#FFF;vertical-align: bottom;">Training in progress</span>\
                                   </li>\
                                   <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>\
                                   </li>\
@@ -967,6 +1057,15 @@
 
       // Train a model
       $(document).on('click', '#train-model-btn', function (e) {
+          
+          new PNotify({
+            title: 'Training Started!',
+            text: 'Model Training has started, see model box below!',
+            type: 'success',
+            styling: 'bootstrap3',
+            addclass: 'dark'
+          });
+
           if (debug){
               console.log("Training model ...",)
           }
@@ -977,7 +1076,7 @@
           selectedEvaluators = (function () { 
                                 selected_evals = [];
                                 $("#evaluator-select :selected").each(function(){
-                                  selected_evals.push($(this).text()); 
+                                    selected_evals.push($(this).text()); 
                                 });
                                 console.log("Found this on collection", selected_evals, typeof(selected_evals))
                                 return selected_evals; 
@@ -1073,6 +1172,91 @@
               }
           });
       });
+
+      // deploy a model
+      $(document).on('click', '.deploybtn', function (e) {
+
+          if (debug){
+              console.log("Deploying model model ...",)
+          }
+          var model_to_deploy_id = $(this).attr("deploy-mid")
+          var e = this  
+          
+          $.ajax({
+              url : workspace_root_url+"/model/deploy?mid="+model_to_deploy_id,
+              type: "GET",
+              data : JSON.stringify({
+                      csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                  }),
+              dataType : "json",
+              success: function( data ){
+                  console.log("deployment completed ...",model_to_deploy_id)
+                  getDeployedModelTestingUI(model_to_deploy_id, function(content){$(e).parent().children(".model-testing-span").html(content);})
+                  //Replace deploy button with undeploy btn
+                  $(e).replaceWith('<button type="button" undeploy-mid="'+model_to_deploy_id+'" class="undeployBtn btn btn-sm btn-danger">UnDeploy model</button>')
+                  parent_wid = $("span[label-mid="+model_to_deploy_id+"]").attr("pwid")
+                  $("span[label-mid="+model_to_deploy_id+"]").replaceWith(getModelLabel(model_to_deploy_id, parent_wid, "DEPLOYED"))
+
+                  new PNotify({
+                    title: 'Model Deployed',
+                    text: 'Your model was deployed successfully, see model box for details!',
+                    type: 'warning',
+                    styling: 'bootstrap3',
+                  });
+              }
+          });
+      });
+
+      // deploy a model
+      $(document).on('click', '.undeployBtn', function (e) {
+        var model_id = $(this).attr("undeploy-mid")
+        var e = this
+        $.ajax({
+            url : workspace_root_url+"/model/undeploy?mid="+model_id,
+            type: "GET",
+            data : JSON.stringify({
+                    csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                }),
+            dataType : "json",
+            success: function( data ){
+                console.log("model undeployed completed ...",model_id)
+                $(e).parent().children('.model-testing-span').html("")
+                $(e).replaceWith('<button type="button" deploy-mid= "'+model_id+'"class=" deploybtn btn btn-sm btn-warning">Deploy model</button>')
+                parent_wid = $("span[label-mid="+model_id+"]").attr("pwid")
+                $("span[label-mid="+model_id+"]").replaceWith(getModelLabel(model_id, parent_wid, "TRAINED"))
+
+                new PNotify({
+                  title: 'Model UnDeployed',
+                  text: 'You model was deployed successfully, see model box for details!',
+                  type: 'success',
+                  styling: 'bootstrap3',
+                });
+            }
+        });
+      });
+
+
+
+      // test a deployed model's API
+      $(document).on('click', '.testBtn', function (e) {
+
+          model_to_test = $(this).attr("test-mid")
+          users = $(this).parent().parent().find(".test-users").first().val()
+          items = $(this).parent().parent().find(".test-items").first().val()
+
+          $.ajax({  
+              url : workspace_root_url+"/model/predict?mid="+model_to_test+"&users="+users+"&items="+items,
+              type: "GET",
+              data : JSON.stringify({
+                      csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                  }),
+              dataType : "json",
+              success: function( data ){
+                $("div[resp-mid="+model_to_test+"]").text(JSON.stringify(data))
+              }
+          });
+      });
+
 
         $.ajaxSetup({beforeSend: function(xhr, settings){
           xhr.setRequestHeader('X-CSRFToken', 
@@ -1202,6 +1386,14 @@
               success: function(data){
                   alert("Deleting the model..")
                   $( "div[mid='"+mid+"']").remove()
+
+                  new PNotify({
+                    title: 'Model Deleted',
+                    text: 'Your model '+mid+' was deleted successfully!',
+                    type: 'info',
+                    styling: 'bootstrap3',
+                    addClass: 'dark',
+                  });
               }
           });
       });
@@ -1218,22 +1410,22 @@
       $(window).load(function(){
           // ORDER IS IMPORTANT HERE, datasets  MUST be listed before WORKSPACES
           getAvailableSamplers(getAvailableEvaluators(getAvailableRecommenders(getDatasetList(getWorkspaceList))));
-          var modelStatusCheck = setInterval(function(){
-              model_divs = $("div[mid]")
-              $.each(model_divs, function(_ , md){
-                  mid = $(md).attr('mid')
-                  statusUI = $(md).attr('mstatus')
-                  if (debug){
-                      console.log("checking status for ",mid)    
-                  }
-                  url = workspace_root_url + "/model/status"+"?mid="+mid
-                  $.get( url, function( model_status ) {
-                      if (model_status == "TRAINED" & statusUI != 'TRAINED'){ //bug
-                          $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
-                      }
-                  });    
-              });
-          }, 10000);
+          // var modelStatusCheck = setInterval(function(){
+          //     model_divs = $("div[mid]")
+          //     $.each(model_divs, function(_ , md){
+          //         mid = $(md).attr('mid')
+          //         statusUI = $(md).attr('mstatus')
+          //         if (debug){
+          //             console.log("checking status for ",mid)    
+          //         }
+          //         url = workspace_root_url + "/model/status"+"?mid="+mid
+          //         $.get( url, function( model_status ) {
+          //             if (model_status == "TRAINED" & statusUI != 'TRAINED'){ //bug
+          //                 $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
+          //             }
+          //         });    
+          //     });
+          // }, 10000);
       });
     </script>
     <script type="text/javascript">
