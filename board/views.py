@@ -28,6 +28,7 @@ from django.contrib.auth.decorators import login_required
 
 from openrec import recommenders
 from openrec.utils import evaluators
+from openrec.utils import samplers
 from time import time
 from bson import ObjectId
 from django.utils.encoding import smart_str
@@ -156,13 +157,20 @@ def list_recommenders(request):
 @login_required(login_url=BOARD_HOME)
 def list_evaluators(request):
     """List available evaluators with openrec"""
-    # _evals = ["auc", "mse", "ndcg", "precision", "recall"]
     _evals = []
     for func in dir(evaluators):
         if callable(getattr(evaluators, func)) and (func.lower()!="evalmanager" and func.lower()!="evaluator"):
             _evals.append(func)
     return JsonResponse(_evals,safe=False)
 
+@login_required(login_url=BOARD_HOME)
+def list_samplers(request):
+    """List available samplers with openrec"""
+    _sampls = []
+    for func in dir(samplers):
+        if callable(getattr(samplers, func)) and func.lower()!="sampler":
+            _sampls.append(func)
+    return JsonResponse(_sampls,safe=False)
 
 def get_dummy_user():
     if len(db.select('user')) == 0:
@@ -353,11 +361,11 @@ class HomePage(TemplateView):
 
 def create(request):
     body = get_request_body(request)
-    _required = ['recommender','train_dataset','test_dataset',"workspace_id","train_iters","eval_iters","save_iters","batch_size","total_items","dim_item_embed"]
+    _required = ['recommender','train_dataset','test_dataset',"workspace_id","train_iters","eval_iters","save_iters","batch_size","total_items","dim_item_embed", "train_sampler", "val_sampler", "test_sampler", "evaluators"]
     for key in _required:
         if not key in body:
             return HttpResponseBadRequest("Bad request")
-
+    
     recommender = body['recommender']
     workspace_id = ObjectId(body['workspace_id'])
     train_dataset = db.get('dataset',id=ObjectId(body['train_dataset']))
@@ -366,6 +374,12 @@ def create(request):
     train_iters = int(body['train_iters'])
     eval_iters = int(body['eval_iters'])
     save_iters = int(body['save_iters'])
+
+    train_sampler = body['train_sampler']
+    val_sampler = body['val_sampler']
+    test_sampler = body['test_sampler']
+
+    evaluators = body['evaluators'] # is a list of evaluator names
 
     print ('Parent process pid:', os.getpid())
     user = get_dummy_user()
@@ -382,6 +396,14 @@ def create(request):
 
     print("MODEL NAME:",model_name)
     print("MODEL NOTES:",notes)
+
+    keys_to_log = ["train_dataset", "test_dataset", "recommender", "workspace_id", "train_iters", "eval_iters", "save_iters", "batch_size", "total_items", "dim_item_embed", "train_sampler", "val_sampler", "test_sampler", "name", "notes", "dim_user_embed", "total_users", "dim_v", "max_seq_len", "num_units","evaluators" ]
+
+    print("######### Training requested with these parameters #########")
+    for key in body.keys():
+        if key in keys_to_log:
+            print(key,":",body[key])
+
     # TODO: maintain a list of available ports later
     tensorboard_port = str(randint(6000,7000)) 
     print("port generated", tensorboard_port,"Starting tb")
@@ -397,7 +419,7 @@ def create(request):
     # TODO: ensure user.id is not None
     dataset_path = DATASET_PATH_PREFIX+str(user.id)+"_file_"+train_dataset.name
     print("\n\n Fetching dataset from path = ", dataset_path ,"\n\n")
-    model_controller_obj = ModelManager(model_id, db, recommender, train_iters, eval_iters, save_iters, 'train_samp', 'val_samp', 'test_samp', 'AUC', dataset_path)
+    model_controller_obj = ModelManager(model_id, db, recommender, train_iters, eval_iters, save_iters, train_sampler, val_sampler, test_sampler, evaluators, dataset_path)
     
     p = Process(target=ModelManager.sample_data_and_train, args=(model_controller_obj,))
     p.start()
