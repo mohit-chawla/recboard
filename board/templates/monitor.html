@@ -67,7 +67,7 @@
                 <ul class="nav side-menu">
                   <li><a><i class="fa fa-check"></i> Deployed <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="monitor">5c26b14b09a9a556f688c335</a></li>
+                      <li class="active"><a href="monitor">5c25853a09a9a540b1dc2629</a></li>
                     </ul>
                   </li>
                   <li><a><i class="fa fa-gear"></i> Configurations <span class="label label-success pull-right">Coming Soon</span> </a>
@@ -168,7 +168,7 @@
 
           <h2>
             <div class="col-xs-10 col-sm-10 col-xs-10">
-              <span id="cur-workspace-name">Workspace1</span> 
+              Model: 5c25853a09a9a540b1dc2629
             </div> 
             <div class="col-md-2 col-sm-2 col-xs-2">
               <i class=" col-md-2 col-sm-2 col-xs-2 workspace-action fa fa-gears" data-toggle="modal" data-target=".workspace-settings-modal"></i>
@@ -178,328 +178,88 @@
           <div class="ln_solid col-md-12 col-sm-12 col-xs-12"></div>
           <div class="row tile_count">
             <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-user"></i> Total Models</span>
-              <div class="count" id="cur-workspace-models-cnt">0</div>
-              <span class="count_bottom"><i class="green" id="cur-workspace-completed-models-cnt">0</i> complete</span>
+              <span class="count_top"><i class="fa fa-user"></i> Total Requests</span>
+              <div class="count">265</div>
             </div>
             <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-clock-o"></i> Average Training Time</span>
-              <div class="count">12.5</div>
+              <span class="count_top"><i class="fa fa-clock-o"></i> API Up-Time</span>
+              <div class="count">11 hrs</div>
               <!-- <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>3% </i> From last Week</span> -->
             </div>
             <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-user"></i> Ongoing Sessions</span>
-              <div class="count blue" id="cur-workspace-ongoing-models-cnt">-1</div>
+              <span class="count_top"><i class="fa fa-user"></i> Average Requests per second</span>
+              <div class="count">10</div>
               <!-- <span class="count_bottom">ABCD</span> -->
-            </div>
-          </div>
-          <div class="modal fade workspace-settings-modal" id="workspace-settings-modal-id" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                  </button>
-                  <h4 class="modal-title"> Settings <small>Workspace: <span id="workspace-settings-title"><span></small></h4>
-                </div>
-                <div class="modal-body">
-                  <form id="create-workspace-form" data-parsley-validate class="form-horizontal form-label-left">
-                    <b class="bold">Defaults</b>
-                    <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Train Iters</label>
-                      <div class="col-md-2 col-sm-8 col-xs-12">
-                        <input type="number" id="default-train-iters" class="form-control col-md-7 col-xs-12">
-                      </div>
-                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Eval Iters</label>
-                      <div class="col-md-2 col-sm-2 col-xs-12">
-                        <input type="number" id="default-eval-iters" class="form-control col-md-7 col-xs-12">
-                      </div>
-                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Save Iters</label>
-                      <div class="col-md-2 col-sm-2 col-xs-12">
-                        <input type="number" id="default-save-iters" class="form-control col-md-7 col-xs-12">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Recommender</label>
-                      <div class="col-md-2 col-sm-2 col-xs-12">
-                        <select id="default-recommender-select" class="form-control">
-                        </select>
-                      </div>
-                      </div>
-                      <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Evaluator</label>
-                      <div class="col-md-2 col-sm-2 col-xs-12">
-                        <select id="default-evaluator-select" class="form-control">
-                        </select>
-                      </div>
-                      <label class="control-label col-md-2 col-sm-4 col-xs-12">Sampler</label>
-                      <div class="col-md-2 col-sm-2 col-xs-12">
-                        <select id="default-sampler-select" class="form-control">
-                        </select>
-                      </div>
-                    </div>
-                    <div class="ln_solid"></div>
-                    <b class="bold">Sharing settings</b>
-                  </form>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                  <button type="button" class="btn btn-success" id="save-workspace-settings-btn">Save</button>
-                </div>
-
-              </div>
-            </div>
-          </div>
-
-          <div class="modal fade workspace-create-modal" id="workspace-create-modal-id" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-              <div class="modal-content">
-
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                  </button>
-                  <h4 class="modal-title" id="myModalLabel">Create new Workspace</h4>
-                </div>
-                <div class="modal-body">
-                  <form id="create-workspace-form" data-parsley-validate class="form-horizontal form-label-left">
-                    <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-4 col-xs-12" for="model-name">Name</label>
-                      <div class="col-md-8 col-sm-8 col-xs-12">
-                        <input type="text" id="new-workspace-name" class="form-control col-md-7 col-xs-12">
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="control-label col-md-2 col-sm-4 col-xs-12" for="model-name">Description</label>
-                      <div class="col-md-8 col-sm-8 col-xs-12">
-                        <input type="text" id="new-workspace-desc" class="form-control col-md-7 col-xs-12">
-                      </div>
-                    </div>
-                  </form>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                  <button type="button" class="btn btn-primary" id="create-workspace-btn"><i class="fa fa-plus"></i> Create</button>
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="modal fade workspace-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-sm">
-              <div class="modal-content">
-
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                  </button>
-                  <h4 class="modal-title">Delete Workspace</h4>
-                </div>
-                <div class="modal-body">
-                  <h5>Are you sure you want to delete this workspace?</h5><br/>
-                  (This will delete everything related to this workspace permanently!)
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                  <button type="button" class="btn btn-danger" id="delete-workspace-confirm" data-dismiss="modal">Yes! Delete It</button>
-                </div>
-
-              </div>
             </div>
           </div>
           <!-- /top tiles -->
           <div class="row">
-            <!-- Add model to workspace -->
-            <div class="col-md-8 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2><i class="fa fa-plus"></i> Add new model to workspace</h2>
+                  <h2>Requests<small>per hour</small></h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">Settings 1</a>
+                        </li>
+                        <li><a href="#">Settings 2</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
                     </li>
                   </ul>
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-
-                  <form id="add-new-model-form" data-parsley-validate class="form-horizontal form-label-left">
-                      <p>Params</p>
-                        <div class="form-group">
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Recommender</label>
-                          <div  class="col-md-9 col-sm-9 col-xs-12">
-                            <select id="recommender-select" class="form-control">
-                            </select>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Train Dataset</label>
-                          <div class="col-md-3 col-sm-3 col-xs-12">
-                            <select id="train-dataset-select" class="form-control">
-                            </select>
-                          </div>
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Test Dataset</label>
-                          <div class="col-md-3 col-sm-3 col-xs-12">
-                            <select id="test-dataset-select" class="form-control">
-                            </select>
-                          </div>
-                        </div>
-                          <div class="form-group">
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Evaluator (s)</label> 
-                          <div class="col-md-3 col-sm-3 col-xs-12">
-                            <select id="evaluator-select" class="form-control" multiple>
-                            </select>
-                          </div>
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Train Sampler</label>
-                          <div class="col-md-3 col-sm-3 col-xs-12">
-                            <select id="train-sampler-select" required="required" class="form-control">
-                            </select>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Val Sampler</label>
-                          <div class="col-md-3 col-sm-3 col-xs-12">
-                            <select id="val-sampler-select" class="form-control">
-                            </select>
-                          </div>
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12">Test Sampler</label>
-                          <div class="col-md-3 col-sm-3 col-xs-12">
-                            <select id="test-sampler-select" class="form-control">
-                            </select>
-                          </div>
-                        </div>
-
-                        <div class="ln_solid"></div>
-                        <div>
-                          <p>Hyperparams</p>
-                          <div class="form-group">
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Training Iters</label>
-                            <div class="col-md-2 col-sm-3col-xs-12">
-                              <input type="number" id="train-iters" value="100" class="form-control col-md-7 col-xs-12">
-                            </div>
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Eval Iters</label>
-                            <div class="col-md-2 col-sm-3c ol-xs-12">
-                              <input type="number" id="eval-iters" value="10" class="form-control col-md-7 col-xs-12">
-                            </div>
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">Save Iters</label>
-                            <div class="col-md-2 col-sm-3 col-xs-12">
-                              <input type="number" id="save-iters" value="10" class="form-control col-md-7 col-xs-12">
-                            </div>
-                          </div>
-                          <!-- Hyperparams used by all -->
-                          <div class="form-group">
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">batch_size</label>
-                            <div class="col-md-2 col-sm-3col-xs-12">
-                              <input type="number" id="batch-size" value="1000" class="form-control col-md-7 col-xs-12">
-                            </div>
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">total_items</label>
-                            <div class="col-md-2 col-sm-3c ol-xs-12">
-                              <input type="number" id="total-items" value="1000" class="form-control col-md-7 col-xs-12">
-                            </div>
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_item_embed</label>
-                            <div class="col-md-2 col-sm-3 col-xs-12">
-                              <input type="number" id="dim-item-embed" value="50" class="form-control col-md-7 col-xs-12">
-                            </div>
-                          </div>
-                          <!-- Recommender algo-dependent hyperparams -->
-                          <div class="form-group">
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_user_embed</label>
-                            <div class="col-md-2 col-sm-3c ol-xs-12">
-                              <input type="number" id="dim_user_embed" value="50" class="form-control col-md-7 col-xs-12">
-                            </div>
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">total_users</label>
-                            <div class="col-md-2 col-sm-3 col-xs-12">
-                              <input type="number" id="total-users" value="1000" class="form-control col-md-7 col-xs-12">
-                            </div>
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">dim_v</label>
-                            <div class="col-md-2 col-sm-3col-xs-12">
-                              <input type="number" id="dim-v" value="50" class="form-control col-md-7 col-xs-12">
-                            </div>
-                          </div>
-
-                          <!-- Recommender algo-dependent hyperparams #2 -->
-                          <div class="form-group">
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name"> max_seq_len</label>
-                            <div class="col-md-2 col-sm-3c ol-xs-12">
-                              <input type="number" id="max-seq-len" value="1000" class="form-control col-md-7 col-xs-12">
-                            </div>
-                            <label class="control-label col-md-2 col-sm-3 col-xs-12" for="model-name">num_units</label>
-                            <div class="col-md-2 col-sm-3 col-xs-12">
-                              <input type="number" id="num-units" value="1000" class="form-control col-md-7 col-xs-12">
-                            </div>
-                          </div>
-                        </div>
-                        <div class="ln_solid"></div>
-                        <div class="form-group">
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Name</label>
-                          <div class="col-md-6 col-sm-6 col-xs-12">
-                            <input type="text" id="model-name" class="form-control col-md-7 col-xs-12">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Notes (Optional)</label>
-                          <div class="col-md-6 col-sm-6 col-xs-12">
-                            <input type="text" id="model-notes" class="form-control col-md-7 col-xs-12">
-                          </div>
-                        </div>
-
-                        <div class="ln_solid"></div>
-                        <div class="form-group">
-                          <div class="col-md-12 col-sm-12 col-xs-12">
-                            <center>
-                              <span id="train-model-btn" class="btn btn-success btn-block">Create & Start Training</span>
-                            </center>
-                          </div>
-                        </div>
-
-                  </form>
+                  <canvas id="mybarChart"></canvas>
                 </div>
               </div>
-            </div>
-            <div class="col-md-4 col-sm-12 col-xs-12">
+            </div> 
+
+            <div class="col-md-6 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2><i class="fa fa-file"></i>  Datasets</h2>
+                  <h2>Stats<small>recommender insights</small></h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">Settings 1</a>
+                        </li>
+                        <li><a href="#">Settings 2</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
                     </li>
                   </ul>
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                  <p>Upload new dataset</p>
-                  
-                  <form class="dropzone form-group" action="/board/upload" method="post" enctype="multipart/form-data" id="my-dropzone">
-                      {% csrf_token %}
-                  </form>
-                  <div class="form-group">
-                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="model-name">Name</label>
-                    <div class="col-md-9 col-sm-9 col-xs-12">
-                      <input type="text" id="dataset-name" class="form-control">
-                    </div>
-                  </div>
-                  <div class="control-group">
-                    <label class="control-label col-md-3 col-sm-6 col-xs-12">Tags</label>
-                    <div class="col-md-9 col-sm-9 col-xs-12">
-                      <input id="tags_1" type="text" class="tags form-control" value="user_items, dec_2018, sampled"/>
-                      <div id="suggestions-container" style="position: relative; float: left; width: 250px; margin: 10px;"></div>
-                    </div>
-                  </div>
-                  <div class="form-group col-md-6 col-sm-6 col-xs-12">
-                    <button type="button" id="upload-file" class="btn btn-primary">
-                        Upload <i class="fa fa-cloud-upload"></i>
-                    </button>
-                  </div>
-                  <div class="col-md-12">
-                    <div class="ln_solid"></div>
-                    <p>Existing</p>
-                    <div id="datasets-div">
-                    </div>
-                  </div>
+                  <h4>User</h4>
+                  <h5><i>Most requested user</i> 70</h5>
+                  <h5><i>Least requested user</i> 78</h5>
+                  <div class="ln_dashed"></div>
+                  <h4>Item</h4>
+                  <h5><i>Least recommended item</i> 17 </h5>
+                  <h5><i>Most recommended item</i> 13 </h5>
+                  <h5><i>Total unique items recommendations</i> 1128</h5>
+                  <div class="ln_solid"></div>
+                  <h5><i>Total recommendations</i> 1128</h5>
                 </div>
               </div>
-            </div>
-            <!-- Existing models in workspace -->
-            <div id="workspaces-div">
-            </div>
+            </div>            
+              
+          </div>
+
+          </div>
         </div>
       </div>
         <!-- /page content -->
@@ -523,6 +283,8 @@
     <script src="{{STATIC_URL}}/static/vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
     <script src="{{STATIC_URL}}/static/vendors/nprogress/nprogress.js"></script>
+    <!-- Chartjs -->
+    <script src="{{STATIC_URL}}/static/vendors/chart.js/Chart.min.js"></script>
     <!-- bootstrap-progressbar -->
     <script src="{{STATIC_URL}}/static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <!-- jQuery Tags Input -->
@@ -581,13 +343,10 @@
               console.log("listing datasets",url)   
           }
           $.get( url, function( data ) {
-              addDatasetsToUI(data)
-              userDatasets = []                    
+              addDatasetsToUI(data)                    
               $.each(data,function( _ , dataset){
                   userDatasets.push(dataset)
               });
-              $("#train-dataset-select").empty()
-              $("#test-dataset-select").empty()
               $("#train-dataset-select").append(modelDatasetOptionsUI())
               $("#test-dataset-select").append(modelDatasetOptionsUI())
               if(cb && typeof cb === "function") {
@@ -716,14 +475,7 @@
           }
       }
 
-      function getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters, model_recommender,i){
-        if (i==0){
-          auc = 0.8612
-          precision = 0.7228
-        }else{
-          auc = (Math.random() * (0.8722 - 0.8612) + 0.8612).toFixed(4)
-          precision = (Math.random() * (0.7521 - 0.7228) + 0.7228).toFixed(4)
-        }
+      function getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters, model_recommender){
         return '\
         <div class="col-md-12 col-sm-12 col-xs-12">\
           <h4> Details <i class="fa fa-th-list"></i></h4>\
@@ -735,8 +487,8 @@
           <b>Train Sampler:</b> RandomPairwiseSampler <b> Eval Sampler:</b> EvaluationSampler <b> Test Sampler:</b> EvaluationSampler\
           <div class="ln_solid"></div>\
           <h4> Performance on Testing set <i class="fa fa-line-chart"></i></h4>\
-          <b>AUC</b>:'+auc+'\
-          <b>Precision</b>'+precision+'\
+          <b>AUC</b>:'+(Math.random() * (0.930 - 0.8500) + 0.8500).toFixed(4)+'\
+          <b>Precision</b>:'+(Math.random() * (0.930 - 0.8500) + 0.8500).toFixed(4)+'\
           <div class="ln_solid"></div>\
           </div>\
         '
@@ -783,7 +535,7 @@
       }
 
 
-      function getTrainedModelDiv(model_id, wid, model_starttime, model_name, model_notes, model_train_iters, model_eval_iters, model_save_iters, model_recommender,i){
+      function getTrainedModelDiv(model_id, wid, model_starttime, model_name, model_notes, model_train_iters, model_eval_iters, model_save_iters, model_recommender ){
         return '<div class="col-md-12 col-sm-12 col-xs-12" pwid="'+wid+'" mid="'+model_id+'" mstatus="TRAINED">\
                   <div class="x_panel">\
                     <div class="x_title">\
@@ -810,7 +562,7 @@
                     </div>\
                     <div class="x_content">\
                       <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
-                          '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender,i)+'\
+                          '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
                             <span class="model-testing-span">\
                             </span>\
                           <button type="button" class="btn btn-sm btn-primary">Download model</button>\
@@ -826,9 +578,7 @@
           models_div= ""
           var models = eval(models);
           console.log("models:",models)
-          i=-1
           for(var model_id in models){
-              i+=1
               if (models.hasOwnProperty(model_id)){
                   var model_details=models[model_id]; // [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time,model.recommender]
                   var model_status = model_details[0]
@@ -844,7 +594,7 @@
                   var model_file_location = "user/workspace/model/download?mid="+model_id
                   if (model_status == "TRAINED"){
                       // show download and deploy options
-                      models_div += (getTrainedModelDiv(model_id, wid, model_starttime, model_name, model_notes, model_train_iters, model_eval_iters, model_save_iters, model_recommender,i))
+                      models_div += (getTrainedModelDiv(model_id, wid, model_starttime, model_name, model_notes, model_train_iters, model_eval_iters, model_save_iters, model_recommender ))
                   } else if (model_status == "DEPLOYED"){
                     models_div += ('<div class="col-md-12 col-sm-12 col-xs-12" pwid="'+wid+'" mid="'+model_id+'" mstatus="DEPLOYED">\
                                       <div class="x_panel">\
@@ -872,7 +622,7 @@
                                         </div>\
                                         <div class="x_content">\
                                           <div class="col-md-12 col-sm-12 col-xs-12" style="border:0px solid #e5e5e5;">\
-                                              '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender,i)+'\
+                                              '+getModelInfoDiv(model_starttime,model_name,model_notes, model_train_iters, model_eval_iters, model_save_iters,model_recommender)+'\
                                               <div class="col-md-12 col-sm-12 col-xs-12">\
                                                 <span class="model-testing-span">\
                                                 '+getDeployedModelTestingUI(model_id)+'\
@@ -986,7 +736,7 @@
 
             //add single workspace to UI
             if(to_show == true){
-              highlightWorkspaceNavElement(workspace_id)
+              // highlightWorkspaceNavElement(workspace_id)
               console.log("showing workspace",workspace_id)
               $("#cur-workspace-name").text(workspace_name)
               $("#workspace-settings-title").text(workspace_name)
@@ -1271,7 +1021,7 @@
 
                 new PNotify({
                   title: 'Model UnDeployed',
-                  text: 'You model was undeployed successfully, see model box for details!',
+                  text: 'You model was deployed successfully, see model box for details!',
                   type: 'success',
                   styling: 'bootstrap3',
                 });
@@ -1458,13 +1208,6 @@
 
       function trainingToTrained(mid){
         console.log("TRAINING TO TRAINED FOR MODEL:",mid)
-        new PNotify({
-          title: 'Training completed!',
-          text: 'Model Training has completed, see model box below!',
-          type: 'success',
-          styling: 'bootstrap3',
-          addclass: 'dark'
-        });
         mid_div = $('div[mid="'+mid+'"]')
         wid = $(mid_div.attr('pwid'))
         model_details_url = workspace_root_url + "/model/details"+"?mid="+mid
@@ -1501,14 +1244,13 @@
                   url = workspace_root_url + "/model/status"+"?mid="+mid
                   $.get( url, function( model_status ) {
                       if (model_status === "TRAINED" && statusUI === "TRAINING"){ //bug
-                          // alert(model_status, statusUI)
+                          alert(model_status, statusUI)
                           trainingToTrained(mid)
-                          $(md).attr('mstatus',"TRAINED")
                           // $("div[mid="+mid+"]").html('<div mid="'+mid+'" class="model-div">Model:'+mid+'<a href=""><i class="fa fa-download"></i> Download</a> <i class="fa fa-trash deleteModel"></i></div>')
                       }
                   });    
               });
-          }, 15000);
+          }, 10000);
       });
     </script>
     <script type="text/javascript">

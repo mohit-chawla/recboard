@@ -113,6 +113,19 @@ def list_models(request):
     return JsonResponse(models_dict,safe=False)
 
 @login_required(login_url=BOARD_HOME)
+def model_details(request):
+    """Returns list of datasets"""
+    mid = request.GET.get('mid','')
+
+    model = db.get('model',id=ObjectId(mid))
+    print(mid, model)
+    models_dict = {}
+    models_dict[str(mid)] = [model.status,model.port,model.file_location,model.name,model.notes,model.train_iters,model.eval_iters,model.save_iters,model.start_time,model.recommender,dm.is_deployed(str(model.id))]
+    print("models_dict:",models_dict)
+    return JsonResponse(models_dict,safe=False)
+
+
+@login_required(login_url=BOARD_HOME)
 def list_datasets(request):
     """Returns list of datasets"""
     user = get_dummy_user()
@@ -358,6 +371,12 @@ class HomePage(TemplateView):
         This is a class based view for home page (/home)
     """
     template_name = 'home.html'
+
+class MonitorPage(TemplateView):
+    """
+        This is a class based view for home page (/home)
+    """
+    template_name = 'monitor.html'
 
 def create(request):
     body = get_request_body(request)
