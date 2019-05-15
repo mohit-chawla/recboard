@@ -537,6 +537,7 @@
     <script type="text/javascript">
       
       var hostname = window.location.origin
+      var home_root_url  = hostname + "/board/home"
       var user_root_url  = hostname + "/board/user"
       var workspace_root_url = user_root_url + "/workspace"
       var dataset_root_url = user_root_url + "/dataset"
@@ -547,6 +548,26 @@
       var availableSamplers = [];
       var iframeTimeout = 10000
 
+      function getUrlVars() {
+          var vars = {};
+          var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+              vars[key] = value;
+          });
+          return vars;
+      }
+
+      function setActiveWorkspaceFromUrl(){
+        // Load requested workspace if available in the url
+        var urlVars = getUrlVars();
+        if ("wid" in urlVars === true){
+          wid = urlVars["wid"]
+          console.log("AS PER URL showing workspace",wid)
+          showWorkspace(wid, function(){
+            // to update URL and remove active wid
+            window.history.replaceState({}, null, home_root_url); 
+          });
+        }
+      }
       function getWorkspaceList(){
           url = workspace_root_url + "/list"
           if (debug){
@@ -554,7 +575,7 @@
           }
           $.get( url, function( workspaces ) {
               // console.log(workspaces)
-              addWorkspacesToUI(workspaces)
+              addWorkspacesToUI(workspaces, setActiveWorkspaceFromUrl);
           });
       }
 
@@ -698,7 +719,7 @@
         $("#cur-workspace-ongoing-models-cnt").text(val)
       }
 
-      function addWorkspacesToUI(workspaces){
+      function addWorkspacesToUI(workspaces, cb){
           //clear existing workspaces
           var workspaces = eval(workspaces);
           i=0
@@ -713,6 +734,10 @@
           
             }
             i+=1
+          }
+          if(cb && typeof cb === "function") {
+            console.log("===== SETTING ACTIVE WORKSPACE USING URL =====");
+            cb();
           }
       }
 
@@ -1354,7 +1379,7 @@
       $(function () {
         $('[data-toggle="tooltip"]').tooltip()
       });
-      
+
       function getCurrentWid(){
         // returns wid of current[visible-and-selected] workspace
         return $("#cur-workspace-name").attr('cur-wid')

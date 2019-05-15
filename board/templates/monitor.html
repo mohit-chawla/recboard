@@ -299,6 +299,7 @@
     <script type="text/javascript">
       
       var hostname = window.location.origin
+      var home_root_url  = hostname + "/board/home"
       var user_root_url  = hostname + "/board/user"
       var workspace_root_url = user_root_url + "/workspace"
       var dataset_root_url = user_root_url + "/dataset"
@@ -1202,8 +1203,9 @@
       $(document).on('click','.workspaces-nav-li',function(){
         wid = $(this).attr('nwid')
         alert("switching cur workspace to"+wid);
-        showWorkspace(wid); 
-        highlightWorkspaceNavElement(wid);
+        // goto home_root_url 
+        window.location = home_root_url+'/?wid='+wid;
+        // do showWorkspace(wid); and highlightWorkspaceNavElement(wid); in callback
       });
 
       function trainingToTrained(mid){
